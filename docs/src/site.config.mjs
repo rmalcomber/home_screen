@@ -1,14 +1,14 @@
 // One place for the facts that appear all over the site. Markdown pages use the {{tokens}} below
 // (see src/plugins/tokens.mjs), so changing the GitHub link or the version is a one-line edit here.
 
-const repoUrl = 'https://github.com/rmalcomber/home-screen' // TEMPORARY: replace with the real repository
+const repoUrl = 'https://github.com/rmalcomber/home_screen'
 
 export const site = {
   name: 'Home Screen',
   tagline: 'Your links, tools and widgets on one fast, private start page. One small binary, no accounts.',
   // GitHub Pages project site; override with DOCS_BASE=/ for a root deployment (Docker, custom domain).
   site: process.env.DOCS_SITE ?? 'https://rmalcomber.github.io',
-  base: process.env.DOCS_BASE ?? '/home-screen',
+  base: process.env.DOCS_BASE ?? '/home_screen',
   repoUrl,
   releasesUrl: `${repoUrl}/releases`,
   version: '0.1.0-beta',

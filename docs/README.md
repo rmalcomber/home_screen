@@ -5,7 +5,7 @@ The public documentation for Home Screen, built with [Astro](https://astro.build
 ```powershell
 cd docs
 npm ci
-npm run dev        # http://localhost:4321/home-screen/
+npm run dev        # http://localhost:4321/home_screen/
 npm run build      # static site in dist/ (also fails on broken internal links)
 npm run preview    # serve the built site
 ```
@@ -16,7 +16,7 @@ npm run preview    # serve the built site
 |---|---|
 | `src/content/docs/` | Every page, as `.md`. The folder structure is the URL structure |
 | `src/assets/screenshots/` | Screenshots, all WebP |
-| `src/site.config.mjs` | Name, version, beta text, **GitHub and releases links** (temporary placeholder) and base path |
+| `src/site.config.mjs` | Name, version, beta text, **GitHub and releases links** and base path |
 | `src/plugins/tokens.mjs` | Replaces `{{repo}}`, `{{releases}}`, `{{version}}`, `{{metric.key}}` in Markdown |
 | `src/components/Banner.astro` | The beta banner shown on every page |
 | `src/styles/theme.css` | Maps Starlight onto the app's dim theme |
