@@ -54,7 +54,7 @@ impl Url {
     }
 }
 
-fn percent_decode(s: &str) -> String {
+pub(crate) fn percent_decode(s: &str) -> String {
     let b = s.as_bytes();
     let mut out = Vec::with_capacity(b.len());
     let mut i = 0;
@@ -610,7 +610,7 @@ mod tests {
         let sent = h.join().unwrap().remove(0);
         assert!(sent.starts_with("POST /api HTTP/1.1\r\n"));
         assert!(sent.contains("X-Custom: yes\r\n") && sent.contains("User-Agent: mine\r\n") && !sent.contains("home-screen"));
-        assert!(sent.contains("Content-Type: text/plain; charset=utf-8\r\n") && sent.contains("Content-Length: 7\r\n") && !sent.contains("999"));
+        assert!(sent.contains("Content-Type: text/plain; charset=utf-8\r\n") && sent.contains("Content-Length: 7\r\n") && !sent.contains("Content-Length: 999"));
         assert!(sent.ends_with("{\"a\":1}"));
     }
 
