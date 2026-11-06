@@ -235,57 +235,31 @@ fn host_allowed(h: &axum::http::HeaderMap, extra: &[String]) -> bool {
 }
 
 fn perform(r: RunReq) -> Value {
-    use std::io::Read;
-    use std::sync::Arc;
     use std::time::{Duration, Instant};
 
-    if !(r.url.starts_with("http://") || r.url.starts_with("https://")) {
-        return json!({"error": "Only http:// and https:// URLs are supported"});
-    }
     let started = Instant::now();
-    let mut b = ureq::AgentBuilder::new()
-        .timeout(Duration::from_secs(r.timeout.unwrap_or(30).clamp(1, 120)))
-        .redirects(if r.follow { 10 } else { 0 });
-    // ureq has no default TLS backend with native-tls: always supply the OS (schannel) connector.
-    let mut tls = native_tls::TlsConnector::builder();
-    if r.insecure {
-        tls.danger_accept_invalid_certs(true).danger_accept_invalid_hostnames(true);
-    }
-    match tls.build() {
-        Ok(c) => b = b.tls_connector(Arc::new(c)),
-        Err(e) => return json!({"error": e.to_string()}),
-    }
-    let agent = b.build();
-    let mut req = agent.request(&r.method.to_uppercase(), &r.url);
-    for (k, v) in &r.headers {
-        req = req.set(k, v);
-    }
-    let res = match &r.body {
-        Some(body) => req.send_string(body),
-        None => req.call(),
+    let req = crate::http_client::Request {
+        method: r.method.to_uppercase(),
+        url: r.url,
+        headers: r.headers,
+        body: r.body,
+        timeout: Duration::from_secs(r.timeout.unwrap_or(30).clamp(1, 120)),
+        follow: r.follow,
+        insecure: r.insecure,
     };
-    let resp = match res {
+    let resp = match crate::http_client::send(&req, MAX_BODY) {
         Ok(resp) => resp,
-        Err(ureq::Error::Status(_, resp)) => resp,
-        Err(e) => return json!({"error": e.to_string(), "ms": started.elapsed().as_millis() as u64}),
+        Err(e) => return json!({"error": e, "ms": started.elapsed().as_millis() as u64}),
     };
-    let status = resp.status();
-    let status_text = resp.status_text().to_string();
-    let mut headers = Vec::new();
-    for name in resp.headers_names() {
-        for v in resp.all(&name) {
-            headers.push(json!([name, v]));
-        }
-    }
-    let mut buf = Vec::new();
-    let _ = resp.into_reader().take(MAX_BODY as u64 + 1).read_to_end(&mut buf);
+    let headers: Vec<Value> = resp.headers.iter().map(|(k, v)| json!([k, v])).collect();
+    let mut buf = resp.body;
     let truncated = buf.len() > MAX_BODY;
     buf.truncate(MAX_BODY);
     let binary = buf.contains(&0);
     let size = buf.len();
     let body = if binary { String::new() } else { String::from_utf8_lossy(&buf).into_owned() };
     json!({
-        "status": status, "status_text": status_text, "ms": started.elapsed().as_millis() as u64,
+        "status": resp.status, "status_text": resp.status_text, "ms": started.elapsed().as_millis() as u64,
         "headers": headers, "body": body, "binary": binary, "truncated": truncated, "size": size,
     })
 }

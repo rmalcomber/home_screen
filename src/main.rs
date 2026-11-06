@@ -1,5 +1,6 @@
 mod api;
 mod db;
+mod http_client;
 
 use axum::{
     http::{header, StatusCode, Uri},
