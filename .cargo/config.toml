@@ -1,0 +1,24 @@
+# Applies to every cargo invocation in this repository, including build scripts.
+[env]
+# rusqlite's bundled SQLite switches on a long list of optional features (full-text search, R-tree, JSON, window
+# functions, extension loading, ...). Home Screen uses none of them, and together they were a third of the exe.
+# libsqlite3-sys appends these flags after its own defaults, so -U undoes them. The database file format is
+# unchanged. See `node scripts/size-report.mjs --sqlite` for what each group costs.
+#
+# Home Screen's SQL is tiny: CREATE TABLE IF NOT EXISTS, ALTER TABLE ADD COLUMN, PRAGMA journal_mode / table_info,
+# INSERT / UPDATE / DELETE / SELECT with sub-queries, ON CONFLICT upserts and AUTOINCREMENT. Do not omit any of those.
+#
+# Not omitted on purpose:
+#   SQLITE_OMIT_WINDOWFUNC, _ATTACH, _VACUUM, _ANALYZE, _VIEW, _TRIGGER, _CTE   do not compile with MSVC in this SQLite
+#   SQLITE_THREADSAFE                                                          rusqlite refuses a single-threaded build
+LIBSQLITE3_FLAGS = """\
+-USQLITE_ENABLE_FTS3 -USQLITE_ENABLE_FTS3_PARENTHESIS -USQLITE_ENABLE_FTS5 -USQLITE_ENABLE_RTREE \
+-USQLITE_ENABLE_DBSTAT_VTAB -USQLITE_ENABLE_STAT4 -USQLITE_SOUNDEX -USQLITE_ENABLE_COLUMN_METADATA \
+-USQLITE_ENABLE_LOAD_EXTENSION -USQLITE_ENABLE_MEMORY_MANAGEMENT -USQLITE_ENABLE_API_ARMOR \
+-DSQLITE_OMIT_LOAD_EXTENSION -DSQLITE_OMIT_JSON -DSQLITE_OMIT_DEPRECATED \
+-DSQLITE_OMIT_PROGRESS_CALLBACK -DSQLITE_OMIT_SHARED_CACHE -DSQLITE_OMIT_UTF16 -DSQLITE_OMIT_TRACE \
+-DSQLITE_OMIT_AUTHORIZATION -DSQLITE_OMIT_GET_TABLE -DSQLITE_OMIT_COMPLETE -DSQLITE_OMIT_TCL_VARIABLE \
+-DSQLITE_OMIT_AUTOVACUUM -DSQLITE_OMIT_CHECK -DSQLITE_OMIT_EXPLAIN -DSQLITE_OMIT_INCRBLOB \
+-DSQLITE_OMIT_INTEGRITY_CHECK -DSQLITE_OMIT_TEMPDB -DSQLITE_OMIT_LOCALTIME -DSQLITE_OMIT_FOREIGN_KEY \
+-DSQLITE_OMIT_DECLTYPE -DSQLITE_OMIT_BUILTIN_TEST \
+-DSQLITE_DEFAULT_MEMSTATUS=0 -DSQLITE_DQS=0 -DSQLITE_LIKE_DOESNT_MATCH_BLOBS"""

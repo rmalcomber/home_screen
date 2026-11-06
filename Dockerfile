@@ -19,6 +19,7 @@ FROM rust:alpine AS build
 RUN apk add --no-cache musl-dev linux-headers gcc perl make
 WORKDIR /src
 COPY Cargo.toml Cargo.lock ./
+COPY .cargo ./.cargo
 COPY src ./src
 COPY --from=web /w/dist ./web/dist
 RUN cargo build --release --locked
