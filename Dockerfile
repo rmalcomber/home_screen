@@ -18,7 +18,7 @@ RUN npm run build
 FROM rust:alpine AS build
 RUN apk add --no-cache musl-dev linux-headers gcc perl make
 WORKDIR /src
-COPY Cargo.toml Cargo.lock ./
+COPY Cargo.toml Cargo.lock build.rs ./
 COPY .cargo ./.cargo
 COPY src ./src
 COPY --from=web /w/dist ./web/dist

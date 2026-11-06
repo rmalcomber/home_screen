@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @plugin "daisyui" {
   themes: dim --default;
+  /* daisyUI emits every component it ships; these are the ones no screen uses (checked by scripts/css-audit.mjs) */
+  exclude: aura, avatar, breadcrumbs, calendar, carousel, chat, collapse, countdown, diff, dock, drawer, fab, fieldset, filter, footer, hero, hover3d, hovergallery, indicator, list, mask, megamenu, mockup, otp, progress, radialprogress, rating, skeleton, stack, stat, steps, swap, textrotate, timeline, toast, toggle, tooltip, validator, typography, glass;
 }
 
 /* Tile / bar translucency; --glass is 0 (solid) to 100 (very see-through) */

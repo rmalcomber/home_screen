@@ -11,7 +11,7 @@ Home Screen is a small Rust server with the web interface compiled into it. This
 
 ```text
  Browser ──HTTP──▶  home_screen (one program)
-                     ├─ axum server on 127.0.0.1:7878
+                     ├─ a small HTTP server on 127.0.0.1:7878
                      ├─ the web interface, embedded in the binary
                      └─ SQLite database file (bundled into the binary as a library)
 ```
@@ -22,11 +22,11 @@ There is no separate web server, no Node.js at run time and no database service 
 
 | Piece | Used for |
 |---|---|
-| **axum** + **tokio** | HTTP server and async runtime, with only the features it needs |
-| **rusqlite** (bundled SQLite) | The database. SQLite is compiled in, so nothing is installed |
-| **rust-embed** (compressed) | Embeds the built web interface into the executable |
+| **`std::net`** (our own `server.rs`) | The HTTP/1.1 server: one thread per connection, keep-alive, strict limits. About 400 lines instead of an async web framework. See [Binary size](/reference/binary-size/) |
+| **rusqlite** (bundled SQLite) | The database. SQLite is compiled in, so nothing is installed, with the optional parts (full-text search, R-tree, JSON, extension loading and more) switched off |
+| **`build.rs`** | Embeds the web interface: the web build leaves a gzip copy of each file, and the server sends those bytes unchanged with `Content-Encoding: gzip`, so the program needs no decompressor |
 | **serde** / **serde_json** | JSON for the API |
-| **ureq** + **native-tls** | The curl runner's outgoing requests. Windows uses schannel and macOS uses Security.framework (the operating system's own TLS and certificate store); on Linux, OpenSSL is compiled in, so the Linux binary is static |
+| **`http_client.rs`** + **native-tls** | The curl runner's outgoing requests: our own small HTTP/1.1 client over `native-tls`. Windows uses schannel and macOS uses Security.framework (the operating system's own TLS and certificate store); on Linux, OpenSSL is compiled in, so the Linux binary is static |
 
 The server has {{metric.direct_deps}} direct dependencies and {{metric.crates}} crates in total. It is about {{metric.rust_loc}} lines of Rust.
 
