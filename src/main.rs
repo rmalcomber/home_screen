@@ -7,21 +7,23 @@ use axum::{
     routing::{get, post, put},
     Router,
 };
-use rust_embed::RustEmbed;
 use std::sync::{Arc, Mutex};
 
-#[derive(RustEmbed)]
-#[folder = "web/dist/"]
-struct Assets;
+// The web app, gzipped by web/scripts/pack.mjs and embedded by build.rs: `ASSETS: &[(name, gzip bytes)]`.
+include!(concat!(env!("OUT_DIR"), "/assets.rs"));
+
+fn asset(name: &str) -> Option<&'static [u8]> {
+    ASSETS.iter().find(|(n, _)| *n == name).map(|(_, b)| *b)
+}
 
 pub type Shared = Arc<Mutex<rusqlite::Connection>>;
 
 async fn static_files(uri: Uri) -> Response {
     let path = uri.path().trim_start_matches('/');
     let path = if path.is_empty() { "index.html" } else { path };
-    let (file, name) = match Assets::get(path) {
+    let (data, name) = match asset(path) {
         Some(f) => (f, path),
-        None => match Assets::get("index.html") {
+        None => match asset("index.html") {
             Some(f) => (f, "index.html"),
             None => return StatusCode::NOT_FOUND.into_response(),
         },
@@ -32,8 +34,13 @@ async fn static_files(uri: Uri) -> Response {
         "public, max-age=31536000, immutable"
     };
     (
-        [(header::CONTENT_TYPE, mime_for(name)), (header::CACHE_CONTROL, cache)],
-        file.data.into_owned(),
+        [
+            (header::CONTENT_TYPE, mime_for(name)),
+            (header::CACHE_CONTROL, cache),
+            (header::CONTENT_ENCODING, "gzip"),
+            (header::VARY, "Accept-Encoding"),
+        ],
+        data,
     )
         .into_response()
 }
