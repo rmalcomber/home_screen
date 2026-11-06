@@ -1,0 +1,42 @@
+---
+// Global beta banner at the top of every page (replaces Starlight's per-page banner).
+import { site } from '../site.config.mjs'
+const base = import.meta.env.BASE_URL.replace(/\/$/, '')
+---
+
+<div class="beta-banner" role="status" data-pagefind-ignore>
+  <strong>BETA</strong>
+  <span>{site.beta}</span>
+  <a href={`${base}/releases/v0.1.0-beta/`}>Release notes</a>
+  <span aria-hidden="true">·</span>
+  <a href={site.repoUrl} rel="noopener">GitHub</a>
+</div>
+
+<style>
+  @layer starlight.core {
+    .beta-banner {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: baseline;
+      gap: 0.4rem 0.7rem;
+      padding: 0.5rem 1rem;
+      font-size: var(--sl-text-sm);
+      line-height: 1.35;
+      text-align: center;
+      background: var(--sl-color-banner-bg, #e8b64a);
+      color: var(--sl-color-banner-text, #1f1a0a);
+    }
+    .beta-banner strong {
+      letter-spacing: 0.08em;
+      background: rgb(0 0 0 / 0.18);
+      padding: 0.05rem 0.45rem;
+      border-radius: 0.3rem;
+    }
+    .beta-banner a {
+      color: inherit;
+      text-decoration: underline;
+      font-weight: 600;
+    }
+  }
+</style>

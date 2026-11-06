@@ -4,6 +4,8 @@ A personal, self-hosted start page for Chrome: a grid of collapsible **tiles** (
 
 It ships as **one Windows `.exe`** (about 2 MB): a small Rust server with the web app and SQLite built in. No installer, no runtime, no accounts. Run it, point Chrome's home page at it, done.
 
+> The full documentation site (with screenshots, a page per tool and widget, a roadmap and release notes) lives in [`docs/`](docs/README.md): `cd docs && npm run dev`.
+
 - [Quick start](#quick-start)
 - [Using the dashboard](#using-the-dashboard)
   - [Tiles](#tiles) · [Layout](#layout) · [Icons](#icons) · [Search](#search) · [Importing Chrome bookmarks](#importing-chrome-bookmarks) · [Settings](#settings)
@@ -358,6 +360,8 @@ home_screen/
 │  ├─ main.rs                routes, embedded static files, CLI args
 │  ├─ db.rs                  schema, queries, SVG sanitiser (+ tests)
 │  └─ api.rs                 JSON handlers, image/icon storage, curl runner
+├─ docs/                     documentation site (Astro + Starlight, all content in Markdown)
+├─ .github/workflows/        docs deployment to GitHub Pages
 └─ web/                      Preact + Tailwind + DaisyUI (theme: dim), built with Vite
    └─ src/
       ├─ app.jsx, store.js, util.js        shell, state (signals), grid maths, bookmark parsing

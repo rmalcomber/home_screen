@@ -2,6 +2,8 @@
 /target/
 /dist/
 /web/dist/
+/docs/dist/
+/docs/.astro/
 
 # Dependencies
 node_modules/
