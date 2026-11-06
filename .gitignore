@@ -1,0 +1,23 @@
+# Build output
+/target/
+/dist/
+/web/dist/
+
+# Dependencies
+node_modules/
+
+# Local data and logs: the app's SQLite database lives next to the exe
+*.db
+*.db-wal
+*.db-shm
+*.log
+
+# Secrets and local config
+.env
+.env.*
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
