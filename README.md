@@ -63,11 +63,12 @@ The top bar holds the title, a **tile search box** and the **☰ menu** (Launche
 
 ### Tiles
 
-Create one from **☰ → + Add tile**. Pick a type, give it a title and an optional icon, then fill in the type-specific form. Click the ✎ on a tile to edit or delete it. You can have as many tiles as you like.
+Create one from **☰ → + Add tile**. Pick a type, give it a title and an optional icon, then fill in the type-specific form. Point at a tile's title bar and click the ✎ to edit or delete it (it appears on hover; on touch screens it is always shown). You can have as many tiles as you like.
 
 | Type | What it is |
 |---|---|
 | **Bookmarks** | A titled list of links, each with its site favicon. |
+| **Group** | A coloured box that holds other tiles (see [Groups and colours](#groups-and-colours)). |
 | **Developer** | One or more *services*, each with optional **Dev**, **Stage** and **Prod** URLs shown as coloured buttons labelled `{Name} {Env}`: Dev is blue, Stage is amber, **Prod is red**. Use **+ Add service** to put several services in one tile. |
 | **GitHub repos** | A list of repositories. Each row links to the repo and has a **▾** dropdown with **Code, README, Compare, Pull requests, Issues, Actions**. Set an optional **default owner** (for example `rmalcomber`) and then enter just repo names; `owner/repo` or a full GitHub URL also work and override the default owner. |
 | **Widget** | One of the built-in widgets, chosen from a categorised picker (below). |
@@ -100,6 +101,17 @@ Todo shortcuts: `n` new item · `↑ ↓` or `j k` move · `Space` or `x` toggle
 - **Collapse / expand** it by clicking its title bar or the ▾ button. It behaves like an accordion: collapsed tiles shrink to just the header and the tiles below move up.
 - The grid is 12 columns wide. Tiles you drop on top of others push them down, and gaps close up automatically. Positions, sizes and collapsed state are saved.
 - On narrow windows (under 640 px) tiles stack in a single column and dragging is disabled.
+- **Layout menu** (above the grid): choose a layout mode, **free grid** or **2, 3, 4 or 6 equal columns** (columns mode snaps tiles to columns and spreads them out when you switch), and **arrange now**: sort A–Z, group by type, balance into 2/3/4 columns, reset tile sizes, collapse/expand all. The same commands are in the launcher (`> Arrange…`, `> Layout…`).
+
+### Groups and colours
+
+- **＋ Group** (or **☰ → Add group**) makes a box that holds other tiles. Drag tiles in and out by their title bars (a dashed outline shows where they will land), use the **＋** on the group's title bar, or pick **Inside group** in the tile editor. A group has its own grid as wide as itself, grows to contain its tiles, collapses as one, and goes one level deep. Deleting a group deletes the tiles inside it.
+- Every tile and group can have a **colour** from an 11-colour palette (tinted title bar and border; groups are tinted boxes). Choose it in the tile editor.
+
+### Pages and starter templates
+
+- **Pages** are separate dashboards shown as tabs above the grid, each with its own tiles and layout mode (add with **＋**, rename by double-clicking, reorder or delete from the Layout menu). The launcher searches every page.
+- **Starter templates** (**Layout → Starter templates…**, or shown on an empty page): Developer workspace, Link pages, Focus, At a glance and Toolbox. Add one to the current page or to a new page of its own.
 
 ### Icons
 
@@ -377,7 +389,8 @@ home_screen/
 ├─ .github/workflows/        docs.yml (GitHub Pages) and release.yml (binaries, GitHub release, Docker image)
 └─ web/                      Preact + Tailwind + DaisyUI (theme: dim), built with Vite
    └─ src/
-      ├─ app.jsx, store.js, util.js        shell, state (signals), grid maths, bookmark parsing
+      ├─ app.jsx, store.js, util.js        shell, state (signals: tiles, pages), grid maths, bookmark parsing
+      ├─ layout.js, colors.js, templates.js  layout engine (groups, columns, auto-arrange), tile palette, starter templates
       ├─ components/                       Grid, TileEditor, IconPicker, ImportBookmarks, SettingsDialog, ColorTool…
       ├─ tiles/                            tile bodies and widgets (widgets.jsx, widgets_extra.jsx)
       └─ launcher/                         the launcher

@@ -135,21 +135,23 @@ const hit = (a, b) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + effH(b) 
 
 /**
  * Gravity layout: the pinned tile (being dragged) keeps its spot, everything else
- * is placed in (y,x) order at the lowest free row. Returns Map(id -> {x,y,w,h}).
+ * is placed in (y,x) order at the lowest free row. `cols` is the width of the container (12 for a page,
+ * the group's width inside a group). Returns Map(id -> {x,y,w,h}).
  */
-export function compact(tiles, pinnedId = null, over = {}) {
+export function compact(tiles, pinnedId = null, over = {}, cols = COLS) {
   const items = tiles.map((t) => ({ ...t, ...(over[t.id] || {}) }))
   const placed = []
   const pinned = items.find((t) => t.id === pinnedId)
   if (pinned) {
-    pinned.x = Math.max(0, Math.min(COLS - pinned.w, pinned.x))
+    pinned.w = Math.min(cols, Math.max(1, pinned.w))
+    pinned.x = Math.max(0, Math.min(cols - pinned.w, pinned.x))
     pinned.y = Math.max(0, pinned.y)
     placed.push(pinned)
   }
   const rest = items.filter((t) => t !== pinned).sort((a, b) => a.y - b.y || a.x - b.x || a.id - b.id)
   for (const t of rest) {
-    t.w = Math.min(COLS, Math.max(1, t.w))
-    t.x = Math.max(0, Math.min(COLS - t.w, t.x))
+    t.w = Math.min(cols, Math.max(1, t.w))
+    t.x = Math.max(0, Math.min(cols - t.w, t.x))
     let y = 0
     while (placed.some((p) => hit({ ...t, y }, p))) y++
     t.y = y

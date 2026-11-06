@@ -188,3 +188,34 @@ export const BOOKMARKS_HTML = `<!DOCTYPE NETSCAPE-Bookmark-file-1>
 </DL><p>
 </DL><p>
 `
+
+/** Colours for a few tiles on the main page (palette names from web/src/colors.js). */
+export const COLORS = { services: 'blue', aws: 'amber', datadog: 'violet', github: 'slate' }
+
+/** A second page in three-column mode: coloured groups holding tiles, for the groups and layout screenshots. */
+export const TEAM_BOARD = {
+  page: { name: 'Team board', mode: 'columns', cols: 3 },
+  groups: [
+    {
+      title: 'Platform', color: 'blue', icon: 'iconify:fa6-solid:layer-group',
+      children: [
+        { type: 'dev', title: 'Checkout API', h: 8, icon: 'iconify:fa6-solid:cart-shopping', config: { services: [{ name: 'Checkout API', dev: 'https://checkout.dev.acme.dev', stage: 'https://checkout.stage.acme.dev', prod: 'https://checkout.acme.dev' }] } },
+        { type: 'bookmarks', title: 'Runbooks', h: 9, config: { links: [L('Incident response', 'https://sre.google/sre-book/managing-incidents/'), L('Rollback checklist', 'https://docs.github.com/en/actions'), L('Capacity planning', 'https://aws.amazon.com/ec2/'), L('Postmortem template', 'https://www.atlassian.com/software/confluence')] } },
+      ],
+    },
+    {
+      title: 'Delivery', color: 'green', icon: 'iconify:fa6-solid:truck-fast',
+      children: [
+        { type: 'github', title: 'Repositories', h: 9, config: { owner: 'acme-corp', repos: ['checkout-api', 'billing', 'infra'].map((url) => ({ url })) } },
+        { type: 'bookmarks', title: 'Pipelines', h: 8, config: { links: [L('checkout-api · main', 'https://dev.azure.com/'), L('billing · release', 'https://dev.azure.com/'), L('infra · plan', 'https://dev.azure.com/')] } },
+      ],
+    },
+    {
+      title: 'On call', color: 'amber', icon: 'iconify:fa6-solid:bell',
+      children: [
+        { type: 'bookmarks', title: 'Dashboards', h: 8, config: { links: [L('Checkout latency', 'https://www.datadoghq.com/dashboards/'), L('Error budget', 'https://www.datadoghq.com/product/service-level-objectives/'), L('Pager schedule', 'https://www.atlassian.com/software/jira')] } },
+        { type: 'widget', title: 'Handover notes', h: 9, icon: 'iconify:fa6-solid:note-sticky', config: { kind: 'notes', text: 'Handover\n- billing migration freezes Thursday\n- watch checkout p99 after the 4.1.3 deploy' } },
+      ],
+    },
+  ],
+}

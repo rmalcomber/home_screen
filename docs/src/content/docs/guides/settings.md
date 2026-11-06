@@ -2,7 +2,7 @@
 title: Settings
 description: Background colour or image, glass level and the auto-hiding title bar.
 sidebar:
-  order: 6
+  order: 8
 ---
 
 Open **☰ → Settings**. Changes apply instantly and are saved.

@@ -1,5 +1,7 @@
 import { useState } from 'preact/hooks'
-import { editing, saveTile, deleteTile } from '../store.js'
+import { editing, saveTile, deleteTile, pages, currentPage, tiles } from '../store.js'
+import { PALETTE } from '../colors.js'
+import { DEFAULT_SIZE } from '../tiles/sizes.js'
 import { IconPicker } from './IconPicker.jsx'
 import { WidgetPicker } from './WidgetPicker.jsx'
 import { WIDGETS } from '../tiles/widgets.jsx'
@@ -10,6 +12,7 @@ const TYPES = [
   ['dev', 'Developer', 'Dev / Stage / Prod URLs with colour codes'],
   ['github', 'GitHub repos', 'Repo links with a quick-links dropdown'],
   ['widget', 'Widget', 'Clocks, weather, calculators, generators and developer tools'],
+  ['group', 'Group', 'A coloured box that holds other tiles'],
 ]
 
 const DEFAULT_CONFIG = {
@@ -17,10 +20,21 @@ const DEFAULT_CONFIG = {
   dev: { services: [{ name: '', dev: '', stage: '', prod: '' }] },
   github: { owner: '', repos: [] },
   widget: {}, // chosen from the widget picker
+  group: {},
 }
-const DEFAULT_SIZE = { bookmarks: [4, 12], dev: [4, 7], github: [4, 10], widget: [3, 8] }
 
 const Input = (p) => <input class="input input-sm input-bordered w-full" {...p} />
+
+function ColorChoice({ value, onChange }) {
+  return (
+    <div class="flex flex-wrap items-center gap-1.5" role="radiogroup" aria-label="Colour">
+      <button type="button" role="radio" aria-checked={!value} title="No colour" class={`w-6 h-6 rounded-full border border-base-content/30 grid place-items-center text-xs ${!value ? 'ring-2 ring-primary ring-offset-1 ring-offset-base-100' : ''}`} onClick={() => onChange(null)}>⌀</button>
+      {PALETTE.map((c) => (
+        <button type="button" key={c.id} role="radio" aria-checked={value === c.id} title={c.label} aria-label={c.label} class={`w-6 h-6 rounded-full ${value === c.id ? 'ring-2 ring-primary ring-offset-1 ring-offset-base-100' : ''}`} style={{ background: c.value }} onClick={() => onChange(c.id)} />
+      ))}
+    </div>
+  )
+}
 
 function ListEditor({ rows, onChange, fields, addLabel }) {
   const set = (i, k, v) => onChange(rows.map((r, j) => (j === i ? { ...r, [k]: v } : r)))
@@ -37,6 +51,8 @@ function ListEditor({ rows, onChange, fields, addLabel }) {
   )
 }
 
+const groupsOn = (page, exceptId) => tiles.value.filter((t) => t.type === 'group' && t.page_id === page && t.id !== exceptId)
+
 export function TileEditor() {
   const t = editing.value
   if (!t) return null
@@ -52,6 +68,9 @@ function Form({ initial }) {
     const c = initial.config || DEFAULT_CONFIG[type]
     return type === 'dev' ? { services: devServices(c) } : c
   })
+  const [color, setColor] = useState(initial.color || null)
+  const [pageSel, setPageSel] = useState(initial.page_id || currentPage.value?.id)
+  const [parentSel, setParentSel] = useState(initial.parent_id ?? null)
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState('')
   // Title and icon fill themselves in from the chosen widget until you type/pick your own.
@@ -83,7 +102,7 @@ function Form({ initial }) {
       if (type === 'widget') cfg = (await WIDGETS[config.kind]?.prepare?.(config)) || config
       const [w, h] = (type === 'widget' && WIDGETS[config.kind]?.size) || DEFAULT_SIZE[type]
       const finalTitle = title.trim() || (type === 'widget' ? WIDGETS[config.kind]?.label : TYPES.find((x) => x[0] === type)[1])
-      await saveTile({ ...initial, type, title: finalTitle, icon, config: cfg, ...(isNew ? { w, h, x: 0, y: 0 } : {}) })
+      await saveTile({ ...initial, type, title: finalTitle, icon, config: cfg, color, page_id: pageSel, parent_id: type === 'group' ? null : parentSel, ...(isNew ? { w, h, x: 0, y: 0 } : {}) })
       close()
     } catch (ex) {
       setErr(ex.message)
@@ -91,7 +110,9 @@ function Form({ initial }) {
     }
   }
   const del = async () => {
-    if (confirm(`Delete tile "${initial.title}"?`)) { await deleteTile(initial.id); close() }
+    const inside = initial.type === 'group' ? tiles.value.filter((x) => x.parent_id === initial.id).length : 0
+    const what = initial.type === 'group' ? `group "${initial.title}"${inside ? ` and the ${inside} tile${inside === 1 ? '' : 's'} inside it` : ''}` : `tile "${initial.title}"`
+    if (confirm(`Delete ${what}?`)) { await deleteTile(initial.id); close() }
   }
 
   const W = type === 'widget' ? WIDGETS[config.kind] : null
@@ -99,7 +120,7 @@ function Form({ initial }) {
   return (
     <dialog class="modal modal-open" onKeyDown={(e) => e.key === 'Escape' && close()}>
       <form class="modal-box max-w-xl grid gap-3" onSubmit={save}>
-        <h3 class="font-bold text-lg">{isNew ? 'Add tile' : 'Edit tile'}</h3>
+        <h3 class="font-bold text-lg">{type === 'group' ? (isNew ? 'Add group' : 'Edit group') : isNew ? 'Add tile' : 'Edit tile'}</h3>
 
         {isNew && (
           <div class="grid grid-cols-2 gap-2">
@@ -128,6 +149,28 @@ function Form({ initial }) {
         <label class="grid gap-1"><span class="text-xs">Title</span>
           <Input value={title} onInput={(e) => { setTitle(e.target.value); setTitleTouched(e.target.value !== '') }} placeholder={W?.label || TYPES.find((x) => x[0] === type)[1]} autofocus={type !== 'widget'} />
         </label>
+
+        <div class="grid gap-1"><span class="text-xs">Colour</span><ColorChoice value={color} onChange={setColor} /></div>
+
+        {(pages.value.length > 1 || (type !== 'group' && groupsOn(pageSel, initial.id).length > 0)) && (
+          <div class="grid grid-cols-2 gap-2">
+            {pages.value.length > 1 && (
+              <label class="grid gap-1"><span class="text-xs">Page</span>
+                <select class="select select-sm select-bordered w-full" value={pageSel} onChange={(e) => { setPageSel(Number(e.target.value)); setParentSel(null) }}>
+                  {pages.value.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                </select>
+              </label>
+            )}
+            {type !== 'group' && groupsOn(pageSel, initial.id).length > 0 && (
+              <label class="grid gap-1"><span class="text-xs">Inside group</span>
+                <select class="select select-sm select-bordered w-full" value={parentSel ?? ''} onChange={(e) => setParentSel(e.target.value === '' ? null : Number(e.target.value))}>
+                  <option value="">(on the page)</option>
+                  {groupsOn(pageSel, initial.id).map((g) => <option key={g.id} value={g.id}>{g.title}</option>)}
+                </select>
+              </label>
+            )}
+          </div>
+        )}
 
         <div class="grid gap-1"><span class="text-xs">Icon (optional)</span><IconPicker value={icon} onChange={(v) => { setIcon(v); setIconTouched(true) }} /></div>
 

@@ -83,6 +83,8 @@ async fn main() {
         .route("/api/tiles", get(api::list_tiles).post(api::create_tile))
         .route("/api/tiles/{id}", put(api::update_tile).delete(api::delete_tile))
         .route("/api/layout", put(api::save_layout))
+        .route("/api/pages", get(api::list_pages).post(api::create_page))
+        .route("/api/pages/{id}", put(api::update_page).delete(api::delete_page))
         .route("/api/icons", get(api::list_icons).post(api::add_icon))
         .route("/api/icons/{id}", get(api::get_icon).delete(api::delete_icon))
         .route("/api/images", post(api::add_image))

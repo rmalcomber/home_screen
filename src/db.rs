@@ -23,6 +23,35 @@ pub struct Tile {
     pub collapsed: bool,
     #[serde(default)]
     pub config: Value,
+    /// Accent colour name from the palette (None = default).
+    #[serde(default)]
+    pub color: Option<String>,
+    /// The group tile this tile sits in (None = directly on the page).
+    #[serde(default)]
+    pub parent_id: Option<i64>,
+    /// The page the tile lives on (0 = the first page).
+    #[serde(default)]
+    pub page_id: i64,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct Page {
+    #[serde(default, deserialize_with = "null_as_zero")]
+    pub id: i64,
+    pub name: String,
+    /// "free" (drag anywhere) or "columns" (fixed equal-width columns).
+    #[serde(default = "d_mode")]
+    pub mode: String,
+    #[serde(default = "d_cols")]
+    pub cols: i64,
+    #[serde(default)]
+    pub position: i64,
+}
+fn d_mode() -> String {
+    "free".into()
+}
+fn d_cols() -> i64 {
+    3
 }
 fn null_as_zero<'de, D: serde::Deserializer<'de>>(d: D) -> Result<i64, D::Error> {
     Ok(Option::<i64>::deserialize(d)?.unwrap_or(0))
@@ -42,6 +71,11 @@ pub struct LayoutItem {
     pub w: i64,
     pub h: i64,
     pub collapsed: bool,
+    #[serde(default)]
+    pub parent_id: Option<i64>,
+    /// 0 = leave the page unchanged.
+    #[serde(default)]
+    pub page_id: i64,
 }
 
 #[derive(Serialize)]
@@ -64,9 +98,27 @@ pub fn open(path: &str) -> rusqlite::Result<Connection> {
             id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, svg TEXT NOT NULL);
          CREATE TABLE IF NOT EXISTS images(
             id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, mime TEXT NOT NULL, data BLOB NOT NULL);
-         CREATE TABLE IF NOT EXISTS settings(key TEXT PRIMARY KEY, value TEXT NOT NULL);",
+         CREATE TABLE IF NOT EXISTS settings(key TEXT PRIMARY KEY, value TEXT NOT NULL);
+         CREATE TABLE IF NOT EXISTS pages(
+            id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL,
+            mode TEXT NOT NULL DEFAULT 'free', cols INTEGER NOT NULL DEFAULT 3,
+            position INTEGER NOT NULL DEFAULT 0);",
     )?;
+    // Upgrades from older databases: add the newer columns in place; existing tiles keep their layout.
+    add_column(&c, "tiles", "color", "TEXT")?;
+    add_column(&c, "tiles", "parent_id", "INTEGER")?;
+    add_column(&c, "tiles", "page_id", "INTEGER NOT NULL DEFAULT 1")?;
+    c.execute("INSERT INTO pages(id,name) SELECT 1,'Home' WHERE NOT EXISTS (SELECT 1 FROM pages)", [])?;
     Ok(c)
+}
+
+fn add_column(c: &Connection, table: &str, col: &str, def: &str) -> rusqlite::Result<()> {
+    let mut s = c.prepare(&format!("PRAGMA table_info({table})"))?;
+    let have = s.query_map([], |r| r.get::<_, String>(1))?.filter_map(|x| x.ok()).any(|n| n == col);
+    if !have {
+        c.execute(&format!("ALTER TABLE {table} ADD COLUMN {col} {def}"), [])?;
+    }
+    Ok(())
 }
 
 fn row_to_tile(r: &rusqlite::Row) -> rusqlite::Result<Tile> {
@@ -82,13 +134,16 @@ fn row_to_tile(r: &rusqlite::Row) -> rusqlite::Result<Tile> {
         h: r.get(7)?,
         collapsed: r.get::<_, i64>(8)? != 0,
         config: serde_json::from_str(&cfg).unwrap_or(Value::Null),
+        color: r.get(10)?,
+        parent_id: r.get(11)?,
+        page_id: r.get(12)?,
     })
 }
 
-const COLS: &str = "id,type,title,icon,x,y,w,h,collapsed,config";
+const COLS: &str = "id,type,title,icon,x,y,w,h,collapsed,config,color,parent_id,page_id";
 
 pub fn list_tiles(c: &Connection) -> rusqlite::Result<Vec<Tile>> {
-    let mut s = c.prepare(&format!("SELECT {COLS} FROM tiles ORDER BY y, x, id"))?;
+    let mut s = c.prepare(&format!("SELECT {COLS} FROM tiles ORDER BY page_id, parent_id, y, x, id"))?;
     let v = s.query_map([], row_to_tile)?.collect();
     v
 }
@@ -98,24 +153,39 @@ pub fn get_tile(c: &Connection, id: i64) -> rusqlite::Result<Option<Tile>> {
         .optional()
 }
 
+/// The page to use: the requested one if it exists, otherwise the first page.
+fn resolve_page(c: &Connection, id: i64) -> rusqlite::Result<i64> {
+    let exists: Option<i64> = c.query_row("SELECT id FROM pages WHERE id=?", [id], |r| r.get(0)).optional()?;
+    match exists {
+        Some(id) => Ok(id),
+        None => c.query_row("SELECT id FROM pages ORDER BY position, id LIMIT 1", [], |r| r.get(0)),
+    }
+}
+
 pub fn create_tile(c: &Connection, t: &Tile) -> rusqlite::Result<Tile> {
-    // Place new tiles below everything else unless told otherwise.
+    let page = resolve_page(c, t.page_id)?;
+    // Place new tiles below everything else in their page/group unless told otherwise.
     let y: i64 = if t.y > 0 {
         t.y
     } else {
-        c.query_row("SELECT COALESCE(MAX(y+h),0) FROM tiles", [], |r| r.get(0))?
+        c.query_row(
+            "SELECT COALESCE(MAX(y+h),0) FROM tiles WHERE page_id=? AND parent_id IS ?",
+            params![page, t.parent_id],
+            |r| r.get(0),
+        )?
     };
     c.execute(
-        "INSERT INTO tiles(type,title,icon,x,y,w,h,collapsed,config) VALUES(?,?,?,?,?,?,?,?,?)",
-        params![t.kind, t.title, t.icon, t.x, y, t.w, t.h, t.collapsed as i64, t.config.to_string()],
+        "INSERT INTO tiles(type,title,icon,x,y,w,h,collapsed,config,color,parent_id,page_id) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)",
+        params![t.kind, t.title, t.icon, t.x, y, t.w, t.h, t.collapsed as i64, t.config.to_string(), t.color, t.parent_id, page],
     )?;
     Ok(get_tile(c, c.last_insert_rowid())?.unwrap())
 }
 
 pub fn update_tile(c: &Connection, id: i64, t: &Tile) -> rusqlite::Result<Option<Tile>> {
+    let page = resolve_page(c, t.page_id)?;
     let n = c.execute(
-        "UPDATE tiles SET type=?,title=?,icon=?,x=?,y=?,w=?,h=?,collapsed=?,config=? WHERE id=?",
-        params![t.kind, t.title, t.icon, t.x, t.y, t.w, t.h, t.collapsed as i64, t.config.to_string(), id],
+        "UPDATE tiles SET type=?,title=?,icon=?,x=?,y=?,w=?,h=?,collapsed=?,config=?,color=?,parent_id=?,page_id=? WHERE id=?",
+        params![t.kind, t.title, t.icon, t.x, t.y, t.w, t.h, t.collapsed as i64, t.config.to_string(), t.color, t.parent_id, page, id],
     )?;
     if n == 0 {
         return Ok(None);
@@ -123,19 +193,71 @@ pub fn update_tile(c: &Connection, id: i64, t: &Tile) -> rusqlite::Result<Option
     get_tile(c, id)
 }
 
+/// Deletes a tile; deleting a group deletes the tiles inside it.
 pub fn delete_tile(c: &Connection, id: i64) -> rusqlite::Result<bool> {
-    Ok(c.execute("DELETE FROM tiles WHERE id=?", [id])? > 0)
+    Ok(c.execute("DELETE FROM tiles WHERE id=? OR parent_id=?", params![id, id])? > 0)
 }
 
 pub fn save_layout(c: &mut Connection, items: &[LayoutItem]) -> rusqlite::Result<()> {
     let tx = c.transaction()?;
     for i in items {
         tx.execute(
-            "UPDATE tiles SET x=?,y=?,w=?,h=?,collapsed=? WHERE id=?",
-            params![i.x, i.y, i.w, i.h, i.collapsed as i64, i.id],
+            "UPDATE tiles SET x=?,y=?,w=?,h=?,collapsed=?,parent_id=?,page_id=CASE WHEN ?=0 THEN page_id ELSE ? END WHERE id=?",
+            params![i.x, i.y, i.w, i.h, i.collapsed as i64, i.parent_id, i.page_id, i.page_id, i.id],
         )?;
     }
     tx.commit()
+}
+
+pub fn list_pages(c: &Connection) -> rusqlite::Result<Vec<Page>> {
+    let mut s = c.prepare("SELECT id,name,mode,cols,position FROM pages ORDER BY position, id")?;
+    let v = s
+        .query_map([], |r| Ok(Page { id: r.get(0)?, name: r.get(1)?, mode: r.get(2)?, cols: r.get(3)?, position: r.get(4)? }))?
+        .collect();
+    v
+}
+
+fn clean_page(p: &Page) -> (String, String, i64) {
+    let name = p.name.trim();
+    let name = if name.is_empty() { "Page" } else { name };
+    let mode = if p.mode == "columns" { "columns" } else { "free" };
+    (name.chars().take(60).collect(), mode.to_string(), p.cols.clamp(2, 6))
+}
+
+pub fn get_page(c: &Connection, id: i64) -> rusqlite::Result<Option<Page>> {
+    c.query_row("SELECT id,name,mode,cols,position FROM pages WHERE id=?", [id], |r| {
+        Ok(Page { id: r.get(0)?, name: r.get(1)?, mode: r.get(2)?, cols: r.get(3)?, position: r.get(4)? })
+    })
+    .optional()
+}
+
+pub fn create_page(c: &Connection, p: &Page) -> rusqlite::Result<Page> {
+    let (name, mode, cols) = clean_page(p);
+    let pos: i64 = c.query_row("SELECT COALESCE(MAX(position)+1,0) FROM pages", [], |r| r.get(0))?;
+    c.execute("INSERT INTO pages(name,mode,cols,position) VALUES(?,?,?,?)", params![name, mode, cols, pos])?;
+    Ok(get_page(c, c.last_insert_rowid())?.unwrap())
+}
+
+pub fn update_page(c: &Connection, id: i64, p: &Page) -> rusqlite::Result<Option<Page>> {
+    let (name, mode, cols) = clean_page(p);
+    let n = c.execute(
+        "UPDATE pages SET name=?,mode=?,cols=?,position=? WHERE id=?",
+        params![name, mode, cols, p.position, id],
+    )?;
+    if n == 0 {
+        return Ok(None);
+    }
+    get_page(c, id)
+}
+
+/// Deletes a page and everything on it. The last remaining page cannot be deleted (returns false).
+pub fn delete_page(c: &Connection, id: i64) -> rusqlite::Result<bool> {
+    let count: i64 = c.query_row("SELECT COUNT(*) FROM pages", [], |r| r.get(0))?;
+    if count <= 1 {
+        return Ok(false);
+    }
+    c.execute("DELETE FROM tiles WHERE page_id=?", [id])?;
+    Ok(c.execute("DELETE FROM pages WHERE id=?", [id])? > 0)
 }
 
 pub fn list_icons(c: &Connection) -> rusqlite::Result<Vec<IconInfo>> {
@@ -300,14 +422,87 @@ mod tests {
             h: 6,
             collapsed: false,
             config: serde_json::json!({"links":[]}),
+            color: None,
+            parent_id: None,
+            page_id: 0,
         };
         let a = create_tile(&c, &t).unwrap();
         let b = create_tile(&c, &t).unwrap();
         assert_eq!(b.y, 6);
-        save_layout(&mut c, &[LayoutItem { id: a.id, x: 2, y: 3, w: 5, h: 7, collapsed: true }]).unwrap();
+        save_layout(&mut c, &[LayoutItem { id: a.id, x: 2, y: 3, w: 5, h: 7, collapsed: true, parent_id: None, page_id: 0 }]).unwrap();
         let a2 = get_tile(&c, a.id).unwrap().unwrap();
         assert_eq!((a2.x, a2.y, a2.w, a2.h, a2.collapsed), (2, 3, 5, 7, true));
         assert!(delete_tile(&c, b.id).unwrap());
         assert_eq!(list_tiles(&c).unwrap().len(), 1);
+    }
+
+    fn tile(kind: &str, title: &str) -> Tile {
+        serde_json::from_value(serde_json::json!({"type": kind, "title": title})).unwrap()
+    }
+
+    #[test]
+    fn groups_hold_tiles_and_delete_with_them() {
+        let mut c = open(":memory:").unwrap();
+        let g = create_tile(&c, &Tile { color: Some("blue".into()), ..tile("group", "Env") }).unwrap();
+        assert_eq!(g.color.as_deref(), Some("blue"));
+        let a = create_tile(&c, &Tile { parent_id: Some(g.id), ..tile("bookmarks", "A") }).unwrap();
+        let b = create_tile(&c, &Tile { parent_id: Some(g.id), ..tile("bookmarks", "B") }).unwrap();
+        let top = create_tile(&c, &tile("bookmarks", "Top")).unwrap();
+        // children stack below each other inside their group, independent of the page
+        assert_eq!((a.y, b.y), (0, 6));
+        assert_eq!(top.y, 6, "page-level tiles ignore the group's children");
+        // move B out of the group
+        save_layout(&mut c, &[LayoutItem { id: b.id, x: 0, y: 0, w: 4, h: 6, collapsed: false, parent_id: None, page_id: 0 }]).unwrap();
+        assert_eq!(get_tile(&c, b.id).unwrap().unwrap().parent_id, None);
+        assert!(delete_tile(&c, g.id).unwrap());
+        let left: Vec<String> = list_tiles(&c).unwrap().into_iter().map(|t| t.title).collect();
+        assert!(left.contains(&"B".to_string()) && left.contains(&"Top".to_string()) && !left.contains(&"A".to_string()), "{left:?}");
+    }
+
+    #[test]
+    fn pages_isolate_tiles_and_last_page_stays() {
+        let c = open(":memory:").unwrap();
+        let pages = list_pages(&c).unwrap();
+        assert_eq!(pages.len(), 1);
+        assert_eq!(pages[0].name, "Home");
+        let p2 = create_page(&c, &Page { id: 0, name: " Work ".into(), mode: "columns".into(), cols: 99, position: 0 }).unwrap();
+        assert_eq!((p2.name.as_str(), p2.mode.as_str(), p2.cols), ("Work", "columns", 6));
+        let on_home = create_tile(&c, &tile("bookmarks", "H")).unwrap();
+        let on_work = create_tile(&c, &Tile { page_id: p2.id, ..tile("bookmarks", "W") }).unwrap();
+        assert_eq!((on_home.page_id, on_work.page_id), (pages[0].id, p2.id));
+        assert_eq!(on_work.y, 0, "each page starts at the top");
+        assert!(delete_page(&c, p2.id).unwrap());
+        assert_eq!(list_tiles(&c).unwrap().len(), 1);
+        assert!(!delete_page(&c, pages[0].id).unwrap(), "the last page cannot be deleted");
+        // unknown page ids fall back to the first page
+        let t = create_tile(&c, &Tile { page_id: 999, ..tile("bookmarks", "X") }).unwrap();
+        assert_eq!(t.page_id, pages[0].id);
+    }
+
+    #[test]
+    fn upgrades_an_old_database_in_place() {
+        let path = std::env::temp_dir().join(format!("hs_migrate_{}.db", std::process::id()));
+        let p = path.to_string_lossy().to_string();
+        {
+            let old = Connection::open(&p).unwrap();
+            old.execute_batch(
+                "CREATE TABLE tiles(id INTEGER PRIMARY KEY AUTOINCREMENT, type TEXT NOT NULL, title TEXT NOT NULL, icon TEXT,
+                   x INTEGER NOT NULL DEFAULT 0, y INTEGER NOT NULL DEFAULT 0, w INTEGER NOT NULL DEFAULT 4, h INTEGER NOT NULL DEFAULT 6,
+                   collapsed INTEGER NOT NULL DEFAULT 0, config TEXT NOT NULL DEFAULT '{}', created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
+                 INSERT INTO tiles(type,title,x,y,w,h) VALUES('bookmarks','Old',3,2,5,7);",
+            )
+            .unwrap();
+        }
+        let c = open(&p).unwrap();
+        let t = list_tiles(&c).unwrap();
+        assert_eq!(t.len(), 1);
+        assert_eq!((t[0].x, t[0].y, t[0].w, t[0].h, t[0].page_id, t[0].parent_id, t[0].color.clone()), (3, 2, 5, 7, 1, None, None));
+        assert_eq!(list_pages(&c).unwrap().len(), 1);
+        drop(c);
+        // opening twice is harmless
+        assert!(open(&p).is_ok());
+        for ext in ["", "-wal", "-shm"] {
+            let _ = std::fs::remove_file(format!("{p}{ext}"));
+        }
     }
 }

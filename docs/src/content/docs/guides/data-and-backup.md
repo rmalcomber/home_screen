@@ -2,12 +2,12 @@
 title: Data and backup
 description: Where your data lives, what is stored in the browser, and how to back it up.
 sidebar:
-  order: 8
+  order: 10
 ---
 
 ## The database
 
-`home_screen.db` (SQLite) sits next to the program unless you pass `--db`. It holds everything that matters: tiles and their layout, uploaded icons, uploaded images (carousel and background) and settings. The tables are created automatically on first run.
+`home_screen.db` (SQLite) sits next to the program unless you pass `--db`. It holds everything that matters: pages, tiles, groups and their layout, uploaded icons, uploaded images (carousel and background) and settings. The tables are created automatically on first run.
 
 **To back up or move your setup:** stop Home Screen and copy `home_screen.db` (and any `home_screen.db-wal` or `-shm` file next to it). To restore, put it back and start the program.
 

@@ -2,7 +2,7 @@
 title: Icons
 description: Search thousands of icons, paste an icon name, or upload your own SVG.
 sidebar:
-  order: 3
+  order: 5
 ---
 
 Tiles can have an optional icon next to the title. In the tile editor you can:

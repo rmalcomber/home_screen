@@ -2,7 +2,7 @@
 title: Privacy and security
 description: What Home Screen contacts, what it stores, and how the local server is protected.
 sidebar:
-  order: 9
+  order: 11
 ---
 
 ## Authentication

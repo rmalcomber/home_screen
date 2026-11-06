@@ -9,7 +9,7 @@ import { tmpdir } from 'node:os'
 import { join, resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import puppeteer from 'puppeteer-core'
-import { TILES, BOOKMARKS_HTML } from './demo.mjs'
+import { TILES, BOOKMARKS_HTML, COLORS, TEAM_BOARD } from './demo.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const root = resolve(here, '../../..')
@@ -75,11 +75,25 @@ for (const { key, x, y, w, h, tile } of TILES) {
   if (t.config.kind === 'weather') t.config.locations = await Promise.all(t.config.locations.map((l) => geocode(l.city)))
   if (t.config.kind === 'carousel') t.config.images = photos
   if (t.config.kind === 'colorpicker') t.config.alpha = 1
-  const created = await api('POST', '/api/tiles', { ...t, x, y, w, h })
+  const created = await api('POST', '/api/tiles', { ...t, x, y, w, h, color: COLORS[key] ?? null })
   ids[key] = created.id
   layout.push({ id: created.id, x, y, w, h, collapsed: false })
 }
 await api('PUT', '/api/layout', layout)
+// page two: three equal columns of coloured groups (the layout is applied by the app, so only the order matters here)
+const board = await api('POST', '/api/pages', TEAM_BOARD.page)
+const boardLayout = []
+for (const [i, g] of TEAM_BOARD.groups.entries()) {
+  const grp = await api('POST', '/api/tiles', { type: 'group', title: g.title, icon: g.icon, color: g.color, config: {}, x: i * 4, y: 0, w: 4, h: 20, page_id: board.id })
+  boardLayout.push({ id: grp.id, x: i * 4, y: 0, w: 4, h: 20, collapsed: false, parent_id: null, page_id: board.id })
+  let y = 0
+  for (const c of g.children) {
+    const t = await api('POST', '/api/tiles', { ...c, x: 0, y, w: 4, h: c.h, page_id: board.id, parent_id: grp.id })
+    boardLayout.push({ id: t.id, x: 0, y, w: 4, h: c.h, collapsed: false, parent_id: grp.id, page_id: board.id })
+    y += c.h
+  }
+}
+await api('PUT', '/api/layout', boardLayout)
 await api('PUT', '/api/settings', { bgImage: bg, glass: 38, autoHideBar: false })
 
 // ------------------------------------------------------------------ browser
@@ -206,6 +220,55 @@ await setNative(`[data-tile-id="${ids.hash}"] textarea`, 'Hello, Acme!'); await 
 await tileShot('widget-tool-hash', 'hash')
 await setNative(`[data-tile-id="${ids.json}"] textarea`, '{"service":"checkout","env":"prod","replicas":3,"healthy":true}'); await sleep(900)
 await tileShot('widget-tool-json', 'json')
+
+console.log('Groups, colours, pages and layouts')
+await goHome()
+{
+  // the Layout menu, and the starter templates dialog it opens
+  await page.evaluate(() => [...document.querySelectorAll('button')].find((b) => b.textContent.startsWith('Layout')).focus())
+  await sleep(400)
+  await snap('layout-menu', { screenshot: async ({ path }) => { const menus = await page.$$('.dropdown-content'); const b = await menus[menus.length - 1].boundingBox(); await page.screenshot({ path, clip: { x: b.x - 120, y: 0, width: b.width + 140, height: Math.min(900, b.y + b.height + 20) } }) } })
+  await page.evaluate(() => document.activeElement.blur())
+  await page.evaluate(() => [...document.querySelectorAll('button')].find((b) => b.textContent.startsWith('Layout')).focus())
+  await page.evaluate(() => [...[...document.querySelectorAll('.dropdown-content')].pop().querySelectorAll('button')].find((b) => b.textContent.startsWith('Starter templates')).click())
+  await page.waitForSelector('dialog .modal-box'); await sleep(500)
+  await snap('templates-dialog', { screenshot: async ({ path }) => page.screenshot({ path, clip: await box(10) }) })
+  await closeDialog()
+}
+
+// the title bar's edit button appears when you point at it
+{
+  const el = await tile('aws')
+  const b = await el.boundingBox()
+  // headless Chrome drops :hover when it takes a clipped screenshot, so show the hovered state with a style rule
+  const hover = await page.addStyleTag({ content: `[data-tile-id="${ids.aws}"] .edit-btn { opacity: 1 !important }` })
+  await sleep(300)
+  await snap('tile-hover-edit', { screenshot: async ({ path }) => page.screenshot({ path, clip: { x: Math.max(0, b.x - 6), y: Math.max(0, b.y - 6), width: b.width + 12, height: 120 } }) })
+  await page.evaluate((el) => el.remove(), hover)
+}
+
+// page two in columns mode
+await page.evaluate((id) => localStorage.setItem('hs.page', String(id)), board.id)
+await goHome()
+await snap('groups-board', page)
+{
+  // editing a group: its colour palette
+  const gid = (await api('GET', '/api/tiles')).find((t) => t.type === 'group' && t.title === 'Platform').id
+  await page.evaluate((id) => document.querySelector(`[data-tile-id="${id}"] button[title="Edit group"]`).click(), gid)
+  await page.waitForSelector('dialog .modal-box'); await sleep(700)
+  await snap('group-editor', { screenshot: async ({ path }) => page.screenshot({ path, clip: await box(10) }) })
+  await closeDialog()
+}
+
+// a new, empty page: the welcome screen with starter templates
+{
+  const blank = await api('POST', '/api/pages', { name: 'Scratch', mode: 'free', cols: 3 })
+  await page.evaluate((id) => localStorage.setItem('hs.page', String(id)), blank.id)
+  await goHome()
+  await snap('welcome-templates', page)
+  await api('DELETE', `/api/pages/${blank.id}`)
+  await page.evaluate(() => localStorage.setItem('hs.page', '1'))
+}
 
 // social card for link previews (JPEG: chat apps and crawlers don't reliably accept WebP)
 console.log('Social card')

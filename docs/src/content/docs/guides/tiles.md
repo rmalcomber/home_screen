@@ -1,11 +1,13 @@
 ---
 title: Tiles
-description: "The four tile types: bookmarks, developer environments, GitHub repositories and widgets."
+description: "The tile types: bookmarks, developer environments, GitHub repositories, widgets and groups."
 sidebar:
   order: 1
 ---
 
-Create a tile from **☰ → ＋ Add tile**. Click the ✎ on a tile to edit or delete it. There is no limit on how many tiles you have.
+Create a tile from **☰ → ＋ Add tile**. Point at a tile's title bar and click the ✎ to edit or delete it (the button appears when you hover; on touch screens it is always shown). There is no limit on how many tiles you have.
+
+Every tile can have a [colour](/guides/groups-and-colours/#colours), and can sit on a [page](/guides/pages-and-templates/) and inside a [group](/guides/groups-and-colours/).
 
 ![The tile editor for a developer tile, showing services with Dev, Stage and Prod addresses.](../../../assets/screenshots/tile-editor-dev.webp)
 
@@ -27,6 +29,8 @@ Set an optional **default owner** (for example `acme-corp`) and then enter only 
 
 Pick from the [widget gallery](/widgets/): clocks, weather, calculators, generators and developer tools. The title and icon fill in for you when you pick one, and the widget's own settings appear underneath.
 
-## Collapse and expand
+## Group
+
+A coloured box that holds other tiles. See [Groups and colours](/guides/groups-and-colours/).
 
 Click a tile's title bar, or the ▾ button, to collapse it to just its header. The tiles below move up to fill the space. See [Layout](/guides/layout/).

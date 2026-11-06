@@ -46,6 +46,34 @@ pub async fn save_layout(State(s): State<Shared>, Json(items): Json<Vec<db::Layo
     Ok(StatusCode::NO_CONTENT.into_response())
 }
 
+pub async fn list_pages(State(s): State<Shared>) -> R {
+    let c = s.lock().unwrap();
+    Ok(Json(db::list_pages(&c).map_err(ise)?).into_response())
+}
+
+pub async fn create_page(State(s): State<Shared>, Json(p): Json<db::Page>) -> R {
+    let c = s.lock().unwrap();
+    Ok(Json(db::create_page(&c, &p).map_err(ise)?).into_response())
+}
+
+pub async fn update_page(State(s): State<Shared>, Path(id): Path<i64>, Json(p): Json<db::Page>) -> R {
+    let c = s.lock().unwrap();
+    match db::update_page(&c, id, &p).map_err(ise)? {
+        Some(p) => Ok(Json(p).into_response()),
+        None => Err(StatusCode::NOT_FOUND),
+    }
+}
+
+pub async fn delete_page(State(s): State<Shared>, Path(id): Path<i64>) -> R {
+    let c = s.lock().unwrap();
+    if db::delete_page(&c, id).map_err(ise)? {
+        Ok(StatusCode::NO_CONTENT.into_response())
+    } else {
+        // the last page, or an unknown id
+        Err(StatusCode::CONFLICT)
+    }
+}
+
 pub async fn list_icons(State(s): State<Shared>) -> R {
     let c = s.lock().unwrap();
     Ok(Json(db::list_icons(&c).map_err(ise)?).into_response())

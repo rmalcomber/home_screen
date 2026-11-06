@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'preact/hooks'
-import { tiles, query, editing, importing, loaded, error, settings, settingsOpen, launcher, load } from './store.js'
+import { pageTiles, query, editing, importing, loaded, error, settings, settingsOpen, launcher, templatesOpen, load } from './store.js'
 import { Launcher } from './launcher/Launcher.jsx'
 import { SettingsDialog } from './components/SettingsDialog.jsx'
 import { Grid } from './components/Grid.jsx'
 import { TileEditor } from './components/TileEditor.jsx'
+import { PageBar } from './components/PageBar.jsx'
+import { TemplatePicker, TemplateCards } from './components/TemplatePicker.jsx'
 import { ImportBookmarks } from './components/ImportBookmarks.jsx'
 
 export function App() {
@@ -70,6 +72,8 @@ export function App() {
             <li><button onClick={act(() => (launcher.value = { q: '', stamp: Date.now() }))}>Launcher <kbd class="kbd kbd-xs ml-auto">Ctrl+P</kbd></button></li>
             <div class="divider my-0"></div>
             <li><button onClick={act(() => (editing.value = { id: null }))}>＋ Add tile</button></li>
+            <li><button onClick={act(() => (editing.value = { id: null, type: 'group' }))}>＋ Add group</button></li>
+            <li><button onClick={act(() => (templatesOpen.value = true))}>Starter templates</button></li>
             <li><button onClick={act(() => (importing.value = true))}>Import Bookmarks</button></li>
             <div class="divider my-0"></div>
             <li><button onClick={act(() => (settingsOpen.value = true))}>Settings</button></li>
@@ -85,20 +89,26 @@ export function App() {
       )}
 
       <main class={`p-3 ${auto ? 'pt-4' : ''}`}>
-        {loaded.value && tiles.value.length === 0 && (
-          <div class="hero py-24"><div class="hero-content text-center flex-col">
-            <h1 class="text-3xl font-bold">Nothing here yet</h1>
-            <p class="opacity-70">Add a tile, or import your Chrome bookmarks to get started.</p>
-            <div class="flex gap-2">
-              <button class="btn btn-primary" onClick={() => (editing.value = { id: null })}>+ Add tile</button>
-              <button class="btn btn-outline" onClick={() => (importing.value = true)}>Import Bookmarks</button>
+        {loaded.value && <PageBar />}
+        {loaded.value && pageTiles.value.length === 0 && (
+          <div class="py-10 grid gap-6 max-w-5xl mx-auto text-center">
+            <div class="grid gap-2">
+              <h1 class="text-3xl font-bold">Nothing here yet</h1>
+              <p class="opacity-70">Start from a template, add a tile, or import your Chrome bookmarks.</p>
+              <div class="flex gap-2 justify-center">
+                <button class="btn btn-primary" onClick={() => (editing.value = { id: null })}>+ Add tile</button>
+                <button class="btn btn-outline" onClick={() => (editing.value = { id: null, type: 'group' })}>+ Add group</button>
+                <button class="btn btn-outline" onClick={() => (importing.value = true)}>Import Bookmarks</button>
+              </div>
             </div>
-          </div></div>
+            <TemplateCards compact />
+          </div>
         )}
         <Grid />
       </main>
 
       <TileEditor />
+      <TemplatePicker />
       <ImportBookmarks />
       <SettingsDialog />
       <Launcher />

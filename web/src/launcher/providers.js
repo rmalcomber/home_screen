@@ -30,7 +30,9 @@ import { RegexPanel } from './RegexPanel.jsx'
 import { JwtPanel } from './JwtPanel.jsx'
 import { JsonPanel } from './JsonPanel.jsx'
 import { parseCurrency, convertCurrency, getRates } from './currency.js'
-import { tiles, editing, importing, settingsOpen, settings, saveSettings, focusTile, setAllCollapsed } from '../store.js'
+import { tiles, pages, editing, importing, settingsOpen, settings, saveSettings, focusTile, setAllCollapsed, setPage, arrangePage, setPageMode, templatesOpen } from '../store.js'
+import { ARRANGE, COLUMN_CHOICES } from '../layout.js'
+import { defaultSize } from '../tiles/sizes.js'
 import { devServices, ENVS, faviconUrl, parseGithub, githubLinks } from '../util.js'
 
 const open = (url, newTab) => (newTab ? window.open(url, '_blank', 'noopener') : (window.location.href = url))
@@ -494,7 +496,12 @@ registerProvider({
   },
 })
 
-const tileLabel = (t) => ({ bookmarks: 'Bookmarks tile', dev: 'Developer tile', github: 'GitHub tile', widget: `${t.config?.kind || 'Widget'} widget` })[t.type] || t.type
+const tileLabel = (t) => {
+  const where = pages.value.length > 1 ? ` · ${pages.value.find((p) => p.id === t.page_id)?.name || ''}` : ''
+  const parent = t.parent_id != null ? tiles.value.find((x) => x.id === t.parent_id) : null
+  const base = { bookmarks: 'Bookmarks tile', dev: 'Developer tile', github: 'GitHub tile', group: 'Group', widget: `${t.config?.kind || 'Widget'} widget` }[t.type] || t.type
+  return `${base}${parent ? ` in ${parent.title}` : ''}${where}`
+}
 
 // ">" prefix: commands.
 registerProvider({
@@ -505,6 +512,12 @@ registerProvider({
     const cmd = (id, title, run, subtitle) => ({ key: `cmd:${id}`, title, subtitle, kind: 'Command', icon: 'iconify:fa6-solid:terminal', run })
     return [
       cmd('add', 'Add tile', () => (editing.value = { id: null })),
+      cmd('add-group', 'Add group', () => (editing.value = { id: null, type: 'group' })),
+      cmd('templates', 'Starter templates', () => (templatesOpen.value = true)),
+      ...ARRANGE.map((a) => cmd(`arrange:${a.id}`, `Arrange: ${a.label}`, () => arrangePage(a.id, defaultSize), a.hint)),
+      cmd('mode-free', 'Layout: free grid', () => setPageMode('free')),
+      ...COLUMN_CHOICES.map((n) => cmd(`mode-${n}`, `Layout: ${n} columns`, () => setPageMode('columns', n))),
+      ...pages.value.map((pg) => cmd(`page:${pg.id}`, `Go to page: ${pg.name}`, () => setPage(pg.id))),
       cmd('import', 'Import Bookmarks', () => (importing.value = true)),
       cmd('settings', 'Open Settings', () => (settingsOpen.value = true)),
       cmd('collapse', 'Collapse all tiles', () => setAllCollapsed(true)),

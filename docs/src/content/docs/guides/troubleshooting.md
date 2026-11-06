@@ -2,7 +2,7 @@
 title: Troubleshooting
 description: Fixes for the most common problems.
 sidebar:
-  order: 10
+  order: 12
 ---
 
 ## "Failed to fetch" in the page

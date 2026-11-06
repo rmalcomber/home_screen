@@ -2,7 +2,7 @@
 title: Import bookmarks
 description: Turn a Chrome bookmarks export into tiles, grouped by domain.
 sidebar:
-  order: 5
+  order: 7
 ---
 
 **☰ → Import Bookmarks** turns a Chrome export into tiles.

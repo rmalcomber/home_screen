@@ -8,7 +8,12 @@ description: A tour of what Home Screen can do, from tiles and widgets to the la
 ![Home Screen with service, GitHub, AWS, Datadog, Jira, Azure DevOps and internal tool tiles over a blurred background image.](../../assets/screenshots/dashboard-hero.webp)
 
 - **Tiles you arrange**: drag a tile by its title bar, resize it from the corner, collapse it like an accordion. Positions are saved. [Layout](/guides/layout/)
-- **Four tile types**: bookmarks, developer environments, GitHub repositories and widgets. [Tiles](/guides/tiles/)
+- **Groups**: coloured boxes that hold other tiles, with their own grid, that move, resize and collapse as one. [Groups and colours](/guides/groups-and-colours/)
+- **Colours**: tint any tile or group from a palette that suits the theme. [Colours](/guides/groups-and-colours/#colours)
+- **Layout modes and auto-arrange**: a free grid or 2, 3, 4 and 6 equal columns, plus one-click sort, group-by-type and balance commands. [Layout](/guides/layout/)
+- **Pages**: several dashboards as tabs, each with its own tiles and layout mode. [Pages](/guides/pages-and-templates/)
+- **Starter templates**: start from a developer workspace, link pages, a focus page and more. [Templates](/guides/pages-and-templates/#starter-templates)
+- **Four tile types, plus groups**: bookmarks, developer environments, GitHub repositories and widgets. [Tiles](/guides/tiles/)
 - **Icons**: thousands of icons by name (Font Awesome brands, Simple Icons, Material and more) or your own SVG. [Icons](/guides/icons/)
 - **Search**: filter tiles, link titles and partial URLs live. [Search](/guides/search/)
 - **Import**: bring in a Chrome bookmarks export and sort links into tiles by domain. [Import bookmarks](/guides/import-bookmarks/)
@@ -25,7 +30,7 @@ Press <kbd>Ctrl</kbd>+<kbd>P</kbd> anywhere on the dashboard. It searches your t
 | a `curl …` command | a tidy breakdown you can run |
 | JSON, a JWT, CSV, Markdown | formatters, decoders and previews |
 | `qr https://…`, `password 24`, `uuid`, `hash …` | generators |
-| `>` | commands (add tile, import, settings) |
+| `>` | commands (add tile or group, arrange, layout, go to page, import, settings) |
 
 [Launcher overview](/launcher/) · [Search](/launcher/search/) · [All tools](/launcher/calculator/)
 

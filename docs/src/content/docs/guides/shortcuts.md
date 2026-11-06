@@ -2,7 +2,7 @@
 title: Keyboard shortcuts
 description: Every keyboard shortcut in the dashboard, launcher and widgets.
 sidebar:
-  order: 7
+  order: 9
 ---
 
 | Keys | Where | Action |

@@ -2,7 +2,7 @@
 title: Search
 description: The tile search box and the launcher.
 sidebar:
-  order: 4
+  order: 6
 ---
 
 There are two ways to search, and they complement each other.

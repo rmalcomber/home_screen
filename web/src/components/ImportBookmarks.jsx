@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'preact/hooks'
-import { importing, tiles, saveTile } from '../store.js'
+import { importing, pageTiles, saveTile } from '../store.js'
 import { parseBookmarks, groupByDomain, faviconUrl } from '../util.js'
 
 // target values: 'skip' | 'new:<name>' | 'tile:<id>'
@@ -18,7 +18,7 @@ function Dialog() {
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState('')
 
-  const existing = tiles.value.filter((t) => t.type === 'bookmarks')
+  const existing = pageTiles.value.filter((t) => t.type === 'bookmarks')
   const close = () => (importing.value = false)
 
   const onFile = async (e) => {
@@ -63,14 +63,14 @@ function Dialog() {
         const seen = new Set()
         const add = (list) => list.filter((l) => !seen.has(l.url) && seen.add(l.url))
         if (k.startsWith('tile:')) {
-          const t = tiles.value.find((x) => x.id === +k.slice(5))
+          const t = pageTiles.value.find((x) => x.id === +k.slice(5))
           const cur = t.config.links || []
           cur.forEach((l) => seen.add(l.url))
           await saveTile({ ...t, config: { ...t.config, links: [...cur, ...add(links)] } })
         } else {
           const name = k.slice(4)
           // merge into a same-titled tile created earlier in this run or before
-          const t = tiles.value.find((x) => x.type === 'bookmarks' && x.title === name)
+          const t = pageTiles.value.find((x) => x.type === 'bookmarks' && x.title === name)
           if (t) {
             const cur = t.config.links || []
             cur.forEach((l) => seen.add(l.url))
