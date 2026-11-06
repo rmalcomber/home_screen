@@ -1,0 +1,210 @@
+name: Release
+
+# Builds Home Screen for Windows, Linux and macOS (x64 and arm64 where available), publishes a GitHub
+# release, and pushes a multi-architecture Docker image to ghcr.io. No Docker needed on your machine.
+#
+#   Release:  git tag v0.1.0-beta && git push origin v0.1.0-beta
+#   Dry run:  Actions > Release > Run workflow, tag = v0.1.0-beta, "publish" unticked
+#             (builds everything and keeps the files as workflow artifacts; publishes nothing)
+#   Publish without a local tag: same, with "publish" ticked (the tag is created on that commit)
+#
+# Tags containing "-" (v0.1.0-beta, v1.0.0-rc.1) are marked as pre-releases on GitHub.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag, for example v0.1.0-beta'
+        required: true
+      publish:
+        description: 'Publish the GitHub release and Docker image (untick for a dry run)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+env:
+  TAG: ${{ github.event.inputs.tag || github.ref_name }}
+
+jobs:
+  web:
+    name: Web interface
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check the tag looks like a version
+        run: |
+          [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]] || { echo "::error::'$TAG' is not like v1.2.3 or v1.2.3-beta"; exit 1; }
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+        working-directory: web
+      - run: npm test
+        working-directory: web
+      - run: npm run build
+        working-directory: web
+      - uses: actions/upload-artifact@v7
+        with:
+          name: web-dist
+          path: web/dist
+          if-no-files-found: error
+
+  linux:
+    name: Linux ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    needs: web
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: x64, os: ubuntu-latest }
+          # Native Arm runner: free for public repositories only.
+          - { name: arm64, os: ubuntu-24.04-arm }
+    steps:
+      - uses: actions/checkout@v7
+      - uses: docker/setup-buildx-action@v4
+      # Builds inside Alpine (see Dockerfile), so the binary is static and runs on any Linux.
+      - name: Build the static binary
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          target: binary
+          outputs: type=local,dest=out
+          cache-from: type=gha,scope=linux-${{ matrix.name }}
+          cache-to: type=gha,mode=max,scope=linux-${{ matrix.name }}
+          provenance: false
+      - name: Package
+        run: |
+          mkdir stage && cp out/home_screen README.md stage/ && chmod +x stage/home_screen
+          tar -czf "home_screen-$TAG-linux-${{ matrix.name }}.tar.gz" -C stage .
+      - uses: actions/upload-artifact@v7
+        with:
+          name: pkg-linux-${{ matrix.name }}
+          path: home_screen-*.tar.gz
+          if-no-files-found: error
+
+  desktop:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    needs: web
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: windows-x64, os: windows-latest, target: x86_64-pc-windows-msvc, bin: home_screen.exe, test: true }
+          - { name: macos-arm64, os: macos-latest, target: aarch64-apple-darwin, bin: home_screen, test: true }
+          # Cross-compiled on the Apple silicon runner (Rosetta would be needed to run its tests).
+          - { name: macos-x64, os: macos-latest, target: x86_64-apple-darwin, bin: home_screen, test: false }
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          name: web-dist
+          path: web/dist
+      - name: Rust toolchain
+        run: |
+          rustup toolchain install stable --profile minimal --target ${{ matrix.target }}
+          rustup default stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.target }}
+      - if: matrix.test
+        run: cargo test --locked
+      - run: cargo build --release --locked --target ${{ matrix.target }}
+      - name: Package
+        shell: bash
+        run: |
+          mkdir stage
+          cp "target/${{ matrix.target }}/release/${{ matrix.bin }}" README.md stage/
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            (cd stage && 7z a -tzip "../home_screen-$TAG-${{ matrix.name }}.zip" .)
+          else
+            chmod +x stage/home_screen
+            tar -czf "home_screen-$TAG-${{ matrix.name }}.tar.gz" -C stage .
+          fi
+      - uses: actions/upload-artifact@v7
+        with:
+          name: pkg-${{ matrix.name }}
+          path: |
+            home_screen-*.zip
+            home_screen-*.tar.gz
+          if-no-files-found: error
+
+  release:
+    name: GitHub release
+    runs-on: ubuntu-latest
+    needs: [linux, desktop]
+    if: github.event_name == 'push' || inputs.publish
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: pkg-*
+          path: release
+          merge-multiple: true
+      - name: Checksums
+        run: cd release && sha256sum home_screen-* > SHA256SUMS && cat SHA256SUMS
+      - name: Create or update the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          if gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then
+            gh release upload "$TAG" release/* --repo "$REPO" --clobber
+          else
+            flags=(); case "$TAG" in *-*) flags+=(--prerelease);; esac
+            gh release create "$TAG" release/* --repo "$REPO" --target "$GITHUB_SHA" \
+              --title "Home Screen $TAG" --generate-notes "${flags[@]}" \
+              --notes "Docker: \`docker pull ghcr.io/${REPO,,}:${TAG#v}\`. Verify downloads against \`SHA256SUMS\`."
+          fi
+
+  docker:
+    name: Docker image
+    runs-on: ubuntu-latest
+    needs: linux
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: pkg-linux-*
+          path: pkgs
+      # Reuse the exact binaries built above instead of compiling again under emulation.
+      - name: Unpack the Linux binaries
+        run: |
+          mkdir -p docker-bin/amd64 docker-bin/arm64
+          tar -xzf pkgs/pkg-linux-x64/*.tar.gz -C docker-bin/amd64 ./home_screen
+          tar -xzf pkgs/pkg-linux-arm64/*.tar.gz -C docker-bin/arm64 ./home_screen
+      - uses: docker/setup-qemu-action@v4
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/login-action@v4
+        if: github.event_name == 'push' || inputs.publish
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+      - id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=semver,pattern={{version}},value=${{ env.TAG }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ env.TAG }}
+            type=raw,value=latest
+      - uses: docker/build-push-action@v7
+        with:
+          context: .
+          target: runtime-prebuilt
+          platforms: linux/amd64,linux/arm64
+          push: ${{ github.event_name == 'push' || inputs.publish }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          provenance: false

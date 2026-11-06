@@ -13,6 +13,11 @@ rust-embed = { version = "8", features = ["compression"] }
 ureq = { version = "2", default-features = false, features = ["native-tls"] }
 native-tls = "0.2"
 
+# Linux has no OS TLS library to lean on, so OpenSSL is compiled in (vendored). That keeps the Linux and
+# Docker builds self-contained and static (musl). Windows uses schannel and macOS Security.framework.
+[target.'cfg(target_os = "linux")'.dependencies]
+openssl = { version = "0.10", features = ["vendored"] }
+
 [profile.release]
 opt-level = "z"
 lto = true

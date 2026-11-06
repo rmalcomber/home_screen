@@ -1,0 +1,10 @@
+# Used by compose.caddy.yml. The values come from docker/.env.
+{$SITE_ADDRESS:localhost} {
+	encode zstd gzip
+
+	basic_auth {
+		{$BASIC_AUTH_USER:admin} {$BASIC_AUTH_HASH}
+	}
+
+	reverse_proxy home-screen:7878
+}

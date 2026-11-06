@@ -1,0 +1,13 @@
+.git
+.github
+target
+dist
+docs
+docker
+**/node_modules
+web/dist
+*.db
+*.db-wal
+*.db-shm
+.env
+.env.*

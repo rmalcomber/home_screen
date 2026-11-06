@@ -1,0 +1,46 @@
+# Home Screen behind Caddy, with HTTPS and basic authentication. Home Screen itself is not published:
+# only Caddy (ports 80 and 443) is reachable.
+#
+#   cd docker
+#   cp env.example .env       # then edit it (site address, user, password hash)
+#   docker compose -f compose.caddy.yml up -d
+#
+# Create the password hash with:
+#   docker run --rm caddy:2-alpine caddy hash-password --plaintext 'your-password'
+name: home-screen-caddy
+
+services:
+  home-screen:
+    image: ghcr.io/rmalcomber/home_screen:${HOME_SCREEN_TAG:-latest}
+    restart: unless-stopped
+    environment:
+      # The curl runner only works for pages opened via localhost or a name listed here.
+      HOME_SCREEN_ALLOWED_HOSTS: ${SITE_HOSTNAME:-localhost}
+    volumes:
+      - data:/data
+    read_only: true
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - home-screen
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-localhost}
+      BASIC_AUTH_USER: ${BASIC_AUTH_USER:-admin}
+      BASIC_AUTH_HASH: ${BASIC_AUTH_HASH:?Set BASIC_AUTH_HASH in .env (see env.example)}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  data:
+  caddy_data:
+  caddy_config:

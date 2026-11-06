@@ -23,6 +23,8 @@ It ships as **one Windows `.exe`** (about 2 MB): a small Rust server with the we
 
 ## Quick start
 
+Downloads for Windows, Linux (x64, arm64) and macOS (Apple silicon, Intel) are attached to each [GitHub release](https://github.com/rmalcomber/home_screen/releases), and there is a multi-arch Alpine Docker image: see [Docker](#docker).
+
 1. Run `home_screen.exe`. A console window opens and prints something like:
    ```
    Home Screen running at http://localhost:7878  (db: C:\...\home_screen.db)
@@ -39,9 +41,19 @@ It ships as **one Windows `.exe`** (about 2 MB): a small Rust server with the we
 | Option | Environment | Default | Meaning |
 |---|---|---|---|
 | `--port <n>` | `PORT` | `7878` | Port to listen on |
-| `--db <path>` | | `home_screen.db` next to the exe | SQLite database file |
+| `--db <path>` | `HOME_SCREEN_DB` | `home_screen.db` next to the exe | SQLite database file |
+| `--host <addr>` | `HOME_SCREEN_HOST` | `127.0.0.1` | Address to listen on |
+| `--allowed-hosts <names>` | `HOME_SCREEN_ALLOWED_HOSTS` | | Extra host names allowed to use the curl runner (comma separated) |
 
-The server only listens on `127.0.0.1`, so it is not reachable from other machines.
+By default the server only listens on `127.0.0.1`, so it is not reachable from other machines. If you use `--host 0.0.0.0`, put authentication in front of it.
+
+### Docker
+
+```bash
+docker run -d --name home-screen -p 127.0.0.1:7878:7878 -v home-screen-data:/data ghcr.io/rmalcomber/home_screen:latest
+```
+
+The image is Alpine-based (no SSH server), runs as an unprivileged user and supports amd64 and arm64. Compose files are in `docker/`: `compose.yml` (on its own), `compose.caddy.yml` (behind Caddy with HTTPS and basic authentication) and `compose.build.yml` (build from this checkout). The `Dockerfile` builds from source with `docker build .`. See `docker/env.example` and the documentation site.
 
 ---
 
@@ -355,13 +367,14 @@ cd web; npm test        # parsers, converters, launcher logic (Vitest)
 
 ```
 home_screen/
-├─ Cargo.toml, build.ps1
+├─ Cargo.toml, build.ps1, Dockerfile
+├─ docker/                   Compose files (plain, and behind Caddy with basic auth)
 ├─ src/                      Rust server (axum + rusqlite)
 │  ├─ main.rs                routes, embedded static files, CLI args
 │  ├─ db.rs                  schema, queries, SVG sanitiser (+ tests)
 │  └─ api.rs                 JSON handlers, image/icon storage, curl runner
 ├─ docs/                     documentation site (Astro + Starlight, all content in Markdown)
-├─ .github/workflows/        docs deployment to GitHub Pages
+├─ .github/workflows/        docs.yml (GitHub Pages) and release.yml (binaries, GitHub release, Docker image)
 └─ web/                      Preact + Tailwind + DaisyUI (theme: dim), built with Vite
    └─ src/
       ├─ app.jsx, store.js, util.js        shell, state (signals), grid maths, bookmark parsing
@@ -452,5 +465,5 @@ A tile looks like `{ "id", "type", "title", "icon", "x", "y", "w", "h", "collaps
 - **A new build doesn't show up**: hard-refresh with `Ctrl+F5`; the app also has to be restarted after replacing the exe.
 - **`Ctrl+P` opens Chrome's print dialog**: click into the page first so it has focus. The page overrides the shortcut only while it is focused.
 - **Icons, favicons or weather are missing**: they need internet access (see [Privacy and security](#privacy-and-security)).
-- **The curl runner says it only works via localhost**: open the app as `http://localhost:7878` or `http://127.0.0.1:7878`, not via another host name.
+- **The curl runner says it only works via localhost**: open the app as `http://localhost:7878` or `http://127.0.0.1:7878`, or list the name you use in `--allowed-hosts` / `HOME_SCREEN_ALLOWED_HOSTS`.
 - **Lost your layout after changing the port or folder**: data lives in `home_screen.db` next to the exe; make sure you are starting the copy that has your database, or pass `--db`.

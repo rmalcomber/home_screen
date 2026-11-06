@@ -54,7 +54,7 @@ It needs Chrome (set `CHROME_PATH` if it is not in the usual place), ImageMagick
 
 ## Provisional pages
 
-Docker, Linux and macOS install, and locked mode, are documented ahead of the features landing. Each carries a `:::caution[Provisional]` note: search for `Provisional` to find and remove them when the features ship. Names and flags on those pages (`--locked`, `HOME_SCREEN_LOCKED`, `ghcr.io/rmalcomber/home-screen`) are placeholders.
+Locked mode is documented ahead of the feature landing (the Docker page mentions it too). Each place carries a `:::caution[Provisional]` note: search for `Provisional` to find and remove them when it ships. The flag and variable names (`--locked`, `HOME_SCREEN_LOCKED`) are placeholders.
 
 ## Publishing
 

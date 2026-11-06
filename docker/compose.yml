@@ -1,0 +1,22 @@
+# Home Screen on its own. Published on this machine only (127.0.0.1), because there is no sign-in.
+#
+#   docker compose -f docker/compose.yml up -d        then open http://localhost:7878
+#
+# The image tag defaults to "latest"; pin one with HOME_SCREEN_TAG=0.1.0-beta.
+name: home-screen
+
+services:
+  home-screen:
+    image: ghcr.io/rmalcomber/home_screen:${HOME_SCREEN_TAG:-latest}
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${HOME_SCREEN_PORT:-7878}:7878"
+    volumes:
+      - data:/data
+    read_only: true
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  data:

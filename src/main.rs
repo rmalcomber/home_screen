@@ -56,19 +56,26 @@ fn arg(name: &str) -> Option<String> {
     a.iter().position(|x| x == name).and_then(|i| a.get(i + 1).cloned())
 }
 
+/// A setting from the command line, else from the environment (non-empty), else None.
+fn setting(flag: &str, env: &str) -> Option<String> {
+    arg(flag).or_else(|| std::env::var(env).ok().filter(|v| !v.trim().is_empty()))
+}
+
 #[tokio::main]
 async fn main() {
-    let port: u16 = arg("--port")
-        .or_else(|| std::env::var("PORT").ok())
+    let port: u16 = setting("--port", "PORT")
         .and_then(|p| p.parse().ok())
         .unwrap_or(7878);
-    let db_path = arg("--db").unwrap_or_else(|| {
+    let db_path = setting("--db", "HOME_SCREEN_DB").unwrap_or_else(|| {
         std::env::current_exe()
             .ok()
             .and_then(|p| p.parent().map(|d| d.join("home_screen.db")))
             .map(|p| p.to_string_lossy().into_owned())
             .unwrap_or_else(|| "home_screen.db".into())
     });
+    if let Some(hosts) = setting("--allowed-hosts", "HOME_SCREEN_ALLOWED_HOSTS") {
+        api::set_allowed_hosts(&hosts);
+    }
     let conn = db::open(&db_path).expect("open database");
     let state: Shared = Arc::new(Mutex::new(conn));
 
@@ -86,7 +93,9 @@ async fn main() {
         .layer(axum::extract::DefaultBodyLimit::max(8 * 1024 * 1024))
         .with_state(state);
 
-    let addr = format!("127.0.0.1:{port}");
+    // Loopback only by default: there is no sign-in. Containers set --host 0.0.0.0 (HOME_SCREEN_HOST).
+    let host = setting("--host", "HOME_SCREEN_HOST").unwrap_or_else(|| "127.0.0.1".into());
+    let addr = if host.contains(':') { format!("[{host}]:{port}") } else { format!("{host}:{port}") };
     let listener = tokio::net::TcpListener::bind(&addr).await.unwrap_or_else(|e| {
         eprintln!("Cannot bind {addr}: {e}");
         std::process::exit(1);

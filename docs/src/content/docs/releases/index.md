@@ -9,7 +9,7 @@ sidebar:
 Each version of Home Screen has a page here, and a matching release on GitHub where the downloads are attached.
 
 :::note[GitHub releases]
-Release pages will link to their GitHub release once the repository is public. For now the link points to a temporary address: [Releases on GitHub]({{releases}}).
+Every release page mirrors its GitHub release, which is where the downloads are attached: [Releases on GitHub]({{releases}}).
 :::
 
 ## Latest

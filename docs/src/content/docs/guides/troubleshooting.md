@@ -27,7 +27,7 @@ They need internet access. See [Privacy and security](/guides/privacy-and-securi
 
 ## The curl runner says it only works via localhost
 
-Open the app as `http://localhost:7878` or `http://127.0.0.1:7878`, not via another host name.
+Open the app as `http://localhost:7878` or `http://127.0.0.1:7878`. If you use another name on purpose (a reverse proxy or Docker host), start Home Screen with `--allowed-hosts your.name` or set `HOME_SCREEN_ALLOWED_HOSTS`. See [Options](/getting-started/options/#reaching-it-through-a-proxy-or-another-name).
 
 ## My layout disappeared
 

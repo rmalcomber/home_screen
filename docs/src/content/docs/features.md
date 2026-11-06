@@ -44,6 +44,6 @@ Press <kbd>Ctrl</kbd>+<kbd>P</kbd> anywhere on the dashboard. It searches your t
 - **Easy to back up**: one SQLite database next to the program. [Data and backup](/guides/data-and-backup/)
 - **Extensible**: adding a widget or a launcher tool is one small module. [Extending](/reference/extending/)
 
-## Coming before launch
+## Runs anywhere
 
-Docker images, builds for Windows, Linux and macOS, and a locked mode that disables editing. See [Install](/getting-started/install/), [Docker](/getting-started/docker/) and [Locked mode](/getting-started/locked-mode/).
+Builds for Windows, Linux (Intel/AMD and Arm) and macOS (Apple silicon and Intel), plus a small Alpine-based Docker image with Compose files for running behind Caddy with HTTPS and a password. See [Install](/getting-started/install/) and [Docker](/getting-started/docker/). A locked mode that disables editing is [on its way](/getting-started/locked-mode/).

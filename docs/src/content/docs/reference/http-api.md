@@ -5,7 +5,7 @@ sidebar:
   order: 3
 ---
 
-Everything the dashboard does goes through a small JSON API on the same port. There is no authentication, and the server only listens on `127.0.0.1`.
+Everything the dashboard does goes through a small JSON API on the same port. There is no authentication, and the server only listens on `127.0.0.1` unless you start it with `--host`.
 
 | Method and path | Purpose |
 |---|---|

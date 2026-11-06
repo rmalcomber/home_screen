@@ -172,14 +172,32 @@ pub struct RunReq {
 
 const MAX_BODY: usize = 2 * 1024 * 1024;
 
-/// Only our own page on localhost may use the proxy: blocks other websites and DNS-rebinding tricks.
+static ALLOWED_HOSTS: std::sync::OnceLock<Vec<String>> = std::sync::OnceLock::new();
+
+/// Extra host names (beyond localhost) that may use the curl runner, e.g. the name a reverse proxy serves.
+pub fn set_allowed_hosts(list: &str) {
+    let hosts = list
+        .split(',')
+        .map(|h| h.trim().to_ascii_lowercase())
+        .filter(|h| !h.is_empty())
+        .collect();
+    let _ = ALLOWED_HOSTS.set(hosts);
+}
+
+/// Only our own page may use the proxy: blocks other websites and DNS-rebinding tricks. The page must
+/// be opened via localhost or a host name listed in HOME_SCREEN_ALLOWED_HOSTS.
 fn local_origin_only(h: &axum::http::HeaderMap) -> bool {
+    host_allowed(h, ALLOWED_HOSTS.get().map(|v| v.as_slice()).unwrap_or(&[]))
+}
+
+fn host_allowed(h: &axum::http::HeaderMap, extra: &[String]) -> bool {
     let host = h.get(header::HOST).and_then(|v| v.to_str().ok()).unwrap_or("");
     let name = match host.strip_prefix('[') {
         Some(rest) => rest.split(']').next().unwrap_or(""),
         None => host.split(':').next().unwrap_or(""),
-    };
-    if !matches!(name, "localhost" | "127.0.0.1" | "::1") {
+    }
+    .to_ascii_lowercase();
+    if !(matches!(name.as_str(), "localhost" | "127.0.0.1" | "::1") || extra.iter().any(|e| *e == name)) {
         return false;
     }
     match h.get(header::ORIGIN).and_then(|v| v.to_str().ok()) {
@@ -250,4 +268,35 @@ pub async fn run(headers: axum::http::HeaderMap, Json(r): Json<RunReq>) -> R {
     }
     let out = tokio::task::spawn_blocking(move || perform(r)).await.map_err(ise)?;
     Ok(Json(out).into_response())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use axum::http::HeaderMap;
+
+    fn headers(host: &str, origin: Option<&str>) -> HeaderMap {
+        let mut h = HeaderMap::new();
+        h.insert(header::HOST, host.parse().unwrap());
+        if let Some(o) = origin {
+            h.insert(header::ORIGIN, o.parse().unwrap());
+        }
+        h
+    }
+
+    #[test]
+    fn runner_accepts_localhost_only_by_default() {
+        assert!(host_allowed(&headers("localhost:7878", None), &[]));
+        assert!(host_allowed(&headers("127.0.0.1:7878", Some("http://127.0.0.1:7878")), &[]));
+        assert!(!host_allowed(&headers("home.example.com", None), &[]));
+        assert!(!host_allowed(&headers("localhost:7878", Some("https://evil.example")), &[]));
+    }
+
+    #[test]
+    fn runner_accepts_configured_hosts_with_matching_origin() {
+        let extra = vec!["home.example.com".to_string()];
+        assert!(host_allowed(&headers("Home.Example.com", Some("https://Home.Example.com")), &extra));
+        assert!(!host_allowed(&headers("other.example.com", None), &extra));
+        assert!(!host_allowed(&headers("home.example.com", Some("https://evil.example")), &extra));
+    }
 }

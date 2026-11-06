@@ -31,7 +31,7 @@ Inside the executable these files are stored compressed as well, which is part o
 |---|---|
 | **Start-up** (process start to first successful response) | {{metric.startup}} |
 | **Memory at rest** (working set after a short burst of requests) | {{metric.idle_memory}} |
-| **Network** | listens on `127.0.0.1` only; no outgoing connections unless you use a feature that needs one |
+| **Network** | listens on `127.0.0.1` only by default; no outgoing connections unless you use a feature that needs one |
 
 ## The code base
 

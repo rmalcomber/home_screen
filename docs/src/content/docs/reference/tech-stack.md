@@ -26,7 +26,7 @@ There is no separate web server, no Node.js at run time and no database service 
 | **rusqlite** (bundled SQLite) | The database. SQLite is compiled in, so nothing is installed |
 | **rust-embed** (compressed) | Embeds the built web interface into the executable |
 | **serde** / **serde_json** | JSON for the API |
-| **ureq** + **native-tls** | The curl runner's outgoing requests, using the operating system's TLS library |
+| **ureq** + **native-tls** | The curl runner's outgoing requests. Windows uses schannel and macOS uses Security.framework (the operating system's own TLS and certificate store); on Linux, OpenSSL is compiled in, so the Linux binary is static |
 
 The server has {{metric.direct_deps}} direct dependencies and {{metric.crates}} crates in total. It is about {{metric.rust_loc}} lines of Rust.
 
@@ -44,12 +44,12 @@ Only {{metric.runtime_npm}} npm packages ship in the web interface. The rest of 
 
 ## How it is built
 
-`build.ps1` does two things:
+On Windows, `build.ps1` does two things (on Linux and macOS you run the same two commands by hand):
 
 1. `npm ci && npm run build` in `web/` produces the web interface (`web/dist`).
 2. `cargo build --release` compiles the server and embeds those files.
 
-The result is copied to `dist\home_screen.exe`. The release profile is tuned for size:
+The result is copied to `dist\home_screen.exe`. Releases for every platform are built by GitHub Actions; see [Releasing](/reference/releasing/). The release profile is tuned for size:
 
 ```toml
 [profile.release]
