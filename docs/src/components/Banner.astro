@@ -7,7 +7,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '')
 <div class="beta-banner" role="status" data-pagefind-ignore>
   <strong>BETA</strong>
   <span>{site.beta}</span>
-  <a href={`${base}/releases/v0.1.0-beta/`}>Release notes</a>
+  <a href={`${base}/releases/v${site.version}/`}>Release notes</a>
   <span aria-hidden="true">·</span>
   <a href={site.repoUrl} rel="noopener">GitHub</a>
 </div>

@@ -17,7 +17,7 @@ Every release page mirrors its GitHub release, which is where the downloads are 
 | Version | Status | Highlights |
 |---|---|---|
 | [0.2.0-beta](/releases/v0.2.0-beta/) | Unreleased | Groups, colours, pages, layout modes, auto-arrange, starter templates |
-| [{{version}}](/releases/v0.1.0-beta/) | First beta | Dashboard, launcher with {{metric.tools}} tools, {{metric.widgets}} widgets, a {{metric.exe_size}} binary |
+| [0.1.0-beta](/releases/v0.1.0-beta/) | First beta | Dashboard, launcher with {{metric.tools}} tools, {{metric.widgets}} widgets, a {{metric.exe_size}} binary |
 
 ## How versions work
 
