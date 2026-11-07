@@ -4,7 +4,8 @@ import { PALETTE } from '../colors.js'
 import { DEFAULT_SIZE } from '../tiles/sizes.js'
 import { IconPicker } from './IconPicker.jsx'
 import { WidgetPicker } from './WidgetPicker.jsx'
-import { WIDGETS } from '../../tiles/widgets.jsx'
+import { WIDGETS_META } from '../extensions/registry.js'
+import { WidgetOptions, prepareWidget } from '../extensions/WidgetPart.jsx'
 import { devServices } from '../util.js'
 
 const TYPES = [
@@ -85,7 +86,7 @@ function Form({ initial }) {
     if (!iconTouched) setIcon(null)
   }
   const pickWidget = (kind) => {
-    const w = WIDGETS[kind]
+    const w = WIDGETS_META[kind]
     setConfig(w.defaults)
     if (!titleTouched) setTitle(w.label)
     if (!iconTouched) setIcon(w.icon)
@@ -94,14 +95,14 @@ function Form({ initial }) {
   const close = () => (editing.value = null)
   const save = async (e) => {
     e.preventDefault()
-    if (type === 'widget' && !WIDGETS[config.kind]) { setErr('Choose a widget first.'); return }
+    if (type === 'widget' && !WIDGETS_META[config.kind]) { setErr('Choose a widget first.'); return }
     setBusy(true)
     setErr('')
     try {
       let cfg = config
-      if (type === 'widget') cfg = (await WIDGETS[config.kind]?.prepare?.(config)) || config
-      const [w, h] = (type === 'widget' && WIDGETS[config.kind]?.size) || DEFAULT_SIZE[type]
-      const finalTitle = title.trim() || (type === 'widget' ? WIDGETS[config.kind]?.label : TYPES.find((x) => x[0] === type)[1])
+      if (type === 'widget') cfg = await prepareWidget(WIDGETS_META[config.kind], config)
+      const [w, h] = (type === 'widget' && WIDGETS_META[config.kind]?.size) || DEFAULT_SIZE[type]
+      const finalTitle = title.trim() || (type === 'widget' ? WIDGETS_META[config.kind]?.label : TYPES.find((x) => x[0] === type)[1])
       await saveTile({ ...initial, type, title: finalTitle, icon, config: cfg, color, page_id: pageSel, parent_id: type === 'group' ? null : parentSel, ...(isNew ? { w, h, x: 0, y: 0 } : {}) })
       close()
     } catch (ex) {
@@ -115,7 +116,7 @@ function Form({ initial }) {
     if (confirm(`Delete ${what}?`)) { await deleteTile(initial.id); close() }
   }
 
-  const W = type === 'widget' ? WIDGETS[config.kind] : null
+  const W = type === 'widget' ? WIDGETS_META[config.kind] : null
 
   return (
     <dialog class="modal modal-open" onKeyDown={(e) => e.key === 'Escape' && close()}>
@@ -213,7 +214,7 @@ function Form({ initial }) {
         {type === 'widget' && W && (
           <div class="grid gap-2">
             <span class="text-xs font-semibold">{W.label} settings</span>
-            <W.Options config={config} set={merge} />
+            <WidgetOptions meta={W} config={config} set={merge} />
           </div>
         )}
 

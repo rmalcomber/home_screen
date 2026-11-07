@@ -1,11 +1,11 @@
 // Starter templates: ready-made arrangements of tiles, groups and widgets.
 // A template is data. `children` puts tiles inside a group; sizes default to each tile type's usual size.
-import { WIDGETS } from '../tiles/widgets.jsx'
+import { WIDGETS_META } from './extensions/registry.js'
 import { defaultSize } from './tiles/sizes.js'
 import { tiles, currentPage, createTileRaw, addPage, applyLayout } from './store.js'
 import { effH } from './util.js'
 
-const widget = (kind, title, extra = {}) => ({ type: 'widget', title: title ?? WIDGETS[kind].label, icon: WIDGETS[kind].icon, config: { ...WIDGETS[kind].defaults }, w: 4, ...extra })
+const widget = (kind, title, extra = {}) => ({ type: 'widget', title: title ?? WIDGETS_META[kind].label, icon: WIDGETS_META[kind].icon, config: { ...WIDGETS_META[kind].defaults }, w: 4, ...extra })
 const links = (title, list, extra = {}) => ({ type: 'bookmarks', title, config: { links: list.map(([t, url]) => ({ title: t, url })) }, ...extra })
 const group = (title, color, children, extra = {}) => ({ type: 'group', title, color, config: {}, children, ...extra })
 

@@ -1,5 +1,6 @@
 import { Menu } from '../ui/Menu.jsx'
-import { WIDGETS } from '../../tiles/widgets.jsx'
+import { WIDGETS_META } from '../extensions/registry.js'
+import { WidgetBody as ExtensionBody } from '../extensions/WidgetPart.jsx'
 import { faviconUrl, parseGithub, devServices, githubLinks, ENVS, matches } from '../util.js'
 
 export function BookmarksBody({ tile, q }) {
@@ -75,9 +76,9 @@ export function GithubBody({ tile, q }) {
 }
 
 export function WidgetBody({ tile }) {
-  const w = WIDGETS[tile.config?.kind]
+  const w = WIDGETS_META[tile.config?.kind]
   if (!w) return <Empty text="Unknown widget." />
-  return <w.Body tile={tile} />
+  return <ExtensionBody meta={w} tile={tile} />
 }
 
 export const BODIES = { bookmarks: BookmarksBody, dev: DevBody, github: GithubBody, widget: WidgetBody }

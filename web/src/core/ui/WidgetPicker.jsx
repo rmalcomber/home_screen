@@ -1,13 +1,13 @@
 import { useState, useMemo } from 'preact/hooks'
-import { WIDGETS } from '../../tiles/widgets.jsx'
-import { CATEGORIES } from '../../tiles/catalog.js'
+import { WIDGETS_META } from '../extensions/registry.js'
+import { CATEGORIES } from '../extensions/categories.js'
 import { IconView } from './IconView.jsx'
 
 /** Browse widgets by category (or search them all) and pick one. */
 export function WidgetPicker({ value, onPick }) {
   const [cat, setCat] = useState('All')
   const [q, setQ] = useState('')
-  const entries = useMemo(() => Object.entries(WIDGETS), [])
+  const entries = useMemo(() => Object.entries(WIDGETS_META), [])
   const needle = q.trim().toLowerCase()
   const shown = entries.filter(([, w]) => (needle ? `${w.label} ${w.description} ${w.category}`.toLowerCase().includes(needle) : cat === 'All' || w.category === cat))
   const count = (c) => entries.filter(([, w]) => w.category === c).length

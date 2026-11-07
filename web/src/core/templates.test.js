@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { TEMPLATES, countTiles, countGroups } from './templates.js'
-import { WIDGETS } from '../tiles/widgets.jsx'
+import { WIDGETS_META } from './extensions/registry.js'
 import { PALETTE } from './colors.js'
 import { layoutAll } from './layout.js'
 
@@ -16,7 +16,7 @@ describe('starter templates', () => {
     for (const tpl of TEMPLATES) {
       for (const t of [...tpl.tiles, ...kids(tpl)]) {
         expect(types, `${tpl.id}: ${t.title}`).toContain(t.type)
-        if (t.type === 'widget') expect(WIDGETS[t.config.kind], `${tpl.id}: ${t.config.kind}`).toBeTruthy()
+        if (t.type === 'widget') expect(WIDGETS_META[t.config.kind], `${tpl.id}: ${t.config.kind}`).toBeTruthy()
         if (t.color) expect(PALETTE.map((c) => c.id)).toContain(t.color)
         expect(t.title, tpl.id).toBeTruthy()
       }

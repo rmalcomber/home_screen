@@ -22,7 +22,7 @@ const providers = new Map()
 export function registerProvider(p) {
   providers.set(p.id, p)
 }
-export const getProviders = () => [...providers.values()]
+export const getProviders = () => [...providers.values()].sort((a, b) => (a.order ?? 50) - (b.order ?? 50))
 
 /** Score an item for a query; <= 0 means no match. */
 export function score(item, query) {
