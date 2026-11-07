@@ -1,7 +1,7 @@
 // Built-in widgets. Add a new one by adding an entry here:
 //   { label, defaults, Body({tile}), Options({config, set}) }
 import { useState, useEffect, useRef } from 'preact/hooks'
-import { patchConfig } from '../store.js'
+import { patchConfig } from '../core/store.js'
 import { clock, weather } from './widgets_time.jsx'
 
 function useNow(ms) {

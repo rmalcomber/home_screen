@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from 'preact/hooks'
 import { pageTiles, query, editing, importing, loaded, error, settings, settingsOpen, launcher, templatesOpen, load } from './store.js'
 import { Launcher } from './launcher/Launcher.jsx'
-import { SettingsDialog } from './components/SettingsDialog.jsx'
-import { Grid } from './components/Grid.jsx'
-import { TileEditor } from './components/TileEditor.jsx'
-import { PageBar } from './components/PageBar.jsx'
-import { TemplatePicker, TemplateCards } from './components/TemplatePicker.jsx'
-import { ImportBookmarks } from './components/ImportBookmarks.jsx'
+import { SettingsDialog } from './ui/SettingsDialog.jsx'
+import { Grid } from './ui/Grid.jsx'
+import { TileEditor } from './ui/TileEditor.jsx'
+import { PageBar } from './ui/PageBar.jsx'
+import { TemplatePicker, TemplateCards } from './ui/TemplatePicker.jsx'
+import { ImportBookmarks } from './ui/ImportBookmarks.jsx'
 
 export function App() {
   const search = useRef()

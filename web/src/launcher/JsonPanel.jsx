@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from 'preact/hooks'
-import { useHotkeyScope } from './hotkeys.js'
+import { useHotkeyScope } from '../core/launcher/hotkeys.js'
 import { formatJson, stats, highlight } from './json.js'
 import { csvFill } from './csv.js'
-import { remember } from './history.js'
+import { remember } from '../core/launcher/history.js'
 
 const PK = 'launcher.jsonPrefs'
 const loadPrefs = () => {

@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'preact/hooks'
-import { useHotkeyScope } from './hotkeys.js'
+import { useHotkeyScope } from '../core/launcher/hotkeys.js'
 import { FLAGS, createRunner, segments, toLiteral } from './regex.js'
-import { remember } from './history.js'
+import { remember } from '../core/launcher/history.js'
 
 const MAX = 500
 const SHOWN = 100

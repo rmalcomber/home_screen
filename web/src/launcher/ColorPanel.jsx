@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'preact/hooks'
-import { useHotkeyScope } from './hotkeys.js'
-import { ColorTool } from '../components/ColorTool.jsx'
+import { useHotkeyScope } from '../core/launcher/hotkeys.js'
+import { ColorTool } from '../core/ui/ColorTool.jsx'
 import { toHex, formats } from './color.js'
-import { remember } from './history.js'
+import { remember } from '../core/launcher/history.js'
 
 const DEFAULT = { r: 59, g: 130, b: 246, a: 1 }
 

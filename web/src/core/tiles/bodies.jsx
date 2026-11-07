@@ -1,5 +1,5 @@
-import { Menu } from '../components/Menu.jsx'
-import { WIDGETS } from './widgets.jsx'
+import { Menu } from '../ui/Menu.jsx'
+import { WIDGETS } from '../../tiles/widgets.jsx'
 import { faviconUrl, parseGithub, devServices, githubLinks, ENVS, matches } from '../util.js'
 
 export function BookmarksBody({ tile, q }) {

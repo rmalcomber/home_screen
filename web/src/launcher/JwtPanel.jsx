@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'preact/hooks'
-import { useHotkeyScope } from './hotkeys.js'
+import { useHotkeyScope } from '../core/launcher/hotkeys.js'
 import { formatJson, highlight } from './json.js'
 import { extractToken } from './jwt.js'
-import { remember } from './history.js'
+import { remember } from '../core/launcher/history.js'
 
 const STATUS = {
   valid: ['badge-success', 'Valid (not expired)'],

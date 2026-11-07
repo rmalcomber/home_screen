@@ -1,9 +1,9 @@
 import { useState, useMemo, useRef, useEffect } from 'preact/hooks'
-import { useHotkeyScope } from './hotkeys.js'
+import { useHotkeyScope } from '../core/launcher/hotkeys.js'
 import { ECC_LEVELS, buildMatrix, svgPath, toSvg, drawCanvas, wifiString, byteLength } from './qr.js'
 import { parseColor } from './color.js'
 import { shortHash } from './diff.js'
-import { remember } from './history.js'
+import { remember } from '../core/launcher/history.js'
 
 const PK = 'launcher.qrPrefs'
 const DEFAULTS = { ecc: 'M', px: 512, margin: 4, fg: '#000000', bg: '#ffffff' }

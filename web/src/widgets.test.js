@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { WIDGETS } from './tiles/widgets.jsx'
 import { CATEGORIES } from './tiles/catalog.js'
 import { buildQuery } from './tiles/widgets_tools.jsx'
-import { getProviders } from './launcher/registry.js'
+import { getProviders } from './core/launcher/registry.js'
 
 describe('widget catalogue', () => {
   const entries = Object.entries(WIDGETS)

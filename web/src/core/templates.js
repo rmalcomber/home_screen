@@ -1,6 +1,6 @@
 // Starter templates: ready-made arrangements of tiles, groups and widgets.
 // A template is data. `children` puts tiles inside a group; sizes default to each tile type's usual size.
-import { WIDGETS } from './tiles/widgets.jsx'
+import { WIDGETS } from '../tiles/widgets.jsx'
 import { defaultSize } from './tiles/sizes.js'
 import { tiles, currentPage, createTileRaw, addPage, applyLayout } from './store.js'
 import { effH } from './util.js'

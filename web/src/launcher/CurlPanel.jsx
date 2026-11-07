@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'preact/hooks'
-import { useHotkeyScope } from './hotkeys.js'
+import { useHotkeyScope } from '../core/launcher/hotkeys.js'
 import { runPayload } from './curl.js'
-import { remember } from './history.js'
+import { remember } from '../core/launcher/history.js'
 
 const METHOD_CLASS = { GET: 'badge-info', POST: 'badge-success', PUT: 'badge-warning', PATCH: 'badge-warning', DELETE: 'badge-error' }
 const statusClass = (s) => (s >= 500 ? 'badge-error' : s >= 400 ? 'badge-warning' : s >= 300 ? 'badge-info' : 'badge-success')

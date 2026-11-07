@@ -4,7 +4,7 @@ import { PALETTE } from '../colors.js'
 import { DEFAULT_SIZE } from '../tiles/sizes.js'
 import { IconPicker } from './IconPicker.jsx'
 import { WidgetPicker } from './WidgetPicker.jsx'
-import { WIDGETS } from '../tiles/widgets.jsx'
+import { WIDGETS } from '../../tiles/widgets.jsx'
 import { devServices } from '../util.js'
 
 const TYPES = [

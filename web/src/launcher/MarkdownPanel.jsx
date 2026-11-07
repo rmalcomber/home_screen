@@ -1,8 +1,8 @@
 import { useState, useMemo, useRef, useEffect } from 'preact/hooks'
-import { useHotkeyScope } from './hotkeys.js'
+import { useHotkeyScope } from '../core/launcher/hotkeys.js'
 import { parseMarkdown, renderMarkdown, docStats, htmlDocument, mdFill, SAMPLE } from './md.js'
 import { shortHash } from './diff.js'
-import { remember } from './history.js'
+import { remember } from '../core/launcher/history.js'
 
 export function MarkdownPanel({ item, setInput }) {
   const text = item.data.text

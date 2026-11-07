@@ -1,9 +1,9 @@
 import { useState, useEffect, useMemo } from 'preact/hooks'
-import { useHotkeyScope } from './hotkeys.js'
+import { useHotkeyScope } from '../core/launcher/hotkeys.js'
 import { csvToJson, jsonToCsv, csvFill } from './csv.js'
 import { highlight, parseJson } from './json.js'
 import { shortHash } from './diff.js'
-import { remember } from './history.js'
+import { remember } from '../core/launcher/history.js'
 
 const PK = 'launcher.csvPrefs'
 const DEFAULTS = { delimiter: 'auto', header: true, infer: true, emptyNull: true, trim: true, shape: 'objects', outFmt: 'pretty', indent: 2, csvDelim: ',', flatten: true, quoteAll: false }

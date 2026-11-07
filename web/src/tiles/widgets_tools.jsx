@@ -1,9 +1,9 @@
 // Every launcher tool as a dashboard widget. A tool widget hosts the same provider (and result panel) the launcher
 // uses: a text box on top, results below. Input is not stored (it can hold tokens, JSON, curl commands…).
 import { useState, useEffect, useRef } from 'preact/hooks'
-import '../launcher/providers.js' // registers the providers
-import { getProviders } from '../launcher/registry.js'
-import { HotkeyScope } from '../launcher/hotkeys.js'
+import '../core/launcher/providers.js' // registers the providers
+import { getProviders } from '../core/launcher/registry.js'
+import { HotkeyScope } from '../core/launcher/hotkeys.js'
 
 const I = (name) => `iconify:fa6-solid:${name}`
 const CALC = 'Calculators & converters'

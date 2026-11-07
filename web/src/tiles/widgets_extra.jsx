@@ -1,7 +1,7 @@
 // Tabata timer, image carousel and keyboard-driven todo list.
 import { useState, useEffect, useRef } from 'preact/hooks'
-import { patchConfig } from '../store.js'
-import { ColorTool } from '../components/ColorTool.jsx'
+import { patchConfig } from '../core/store.js'
+import { ColorTool } from '../core/ui/ColorTool.jsx'
 import { parseColor, toHex } from '../launcher/color.js'
 
 const Field = ({ label, children }) => (

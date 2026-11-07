@@ -1,5 +1,5 @@
 import { useState } from 'preact/hooks'
-import { parseColor, toHex, formats, contrast, shades, harmonies } from '../launcher/color.js'
+import { parseColor, toHex, formats, contrast, shades, harmonies } from '../../launcher/color.js'
 
 const Swatch = ({ c, onPick, size = 'w-7 h-7', title }) => (
   <button type="button" title={title || toHex(c)} class={`${size} rounded border border-base-content/20 shrink-0 hover:scale-110 transition-transform`} style={{ background: toHex(c, true) }} onClick={() => onPick(c)} />

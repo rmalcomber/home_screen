@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { TEMPLATES, countTiles, countGroups } from './templates.js'
-import { WIDGETS } from './tiles/widgets.jsx'
+import { WIDGETS } from '../tiles/widgets.jsx'
 import { PALETTE } from './colors.js'
 import { layoutAll } from './layout.js'
 

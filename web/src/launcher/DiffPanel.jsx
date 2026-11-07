@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'preact/hooks'
-import { useHotkeyScope } from './hotkeys.js'
+import { useHotkeyScope } from '../core/launcher/hotkeys.js'
 import { computeDiff, toUnifiedDiff, diffFill, shortHash } from './diff.js'
-import { remember } from './history.js'
+import { remember } from '../core/launcher/history.js'
 
 const CONTEXT = 3
 const MAX_ROWS = 4000

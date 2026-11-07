@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'preact/hooks'
 import { launcher } from '../store.js'
 import { search, getProviders, getRecent, pushRecent, route } from './registry.js'
-import { IconView } from '../components/IconView.jsx'
+import { IconView } from '../ui/IconView.jsx'
 import './providers.js'
 
 export function Launcher() {

@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'preact/hooks'
-import { WIDGETS } from '../tiles/widgets.jsx'
-import { CATEGORIES } from '../tiles/catalog.js'
+import { WIDGETS } from '../../tiles/widgets.jsx'
+import { CATEGORIES } from '../../tiles/catalog.js'
 import { IconView } from './IconView.jsx'
 
 /** Browse widgets by category (or search them all) and pick one. */

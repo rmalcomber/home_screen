@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from 'preact/hooks'
-import { useHotkeyScope } from './hotkeys.js'
+import { useHotkeyScope } from '../core/launcher/hotkeys.js'
 import { parseCron, describe, nextRuns, fieldMeaning, FIELD_LABELS } from './cron.js'
 import { relativeTime } from './jwt.js'
-import { remember } from './history.js'
+import { remember } from '../core/launcher/history.js'
 
 const DIALECTS = [
   ['seconds', 'Seconds first · Spring', 'Day of week 0–7, where 0 and 7 are Sunday'],
