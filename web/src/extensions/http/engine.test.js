@@ -125,3 +125,12 @@ describe('lookupMime', () => {
     expect(lookupMime('image/', 3)).toHaveLength(3)
   })
 })
+
+describe('lookups stay on topic', () => {
+  it('drops description-only matches when names match', () => {
+    const names = lookupHeader('content-type').map((h) => h.name)
+    expect(names[0]).toBe('Content-Type')
+    expect(names).not.toContain('Accept')
+    expect(lookupMime('png').map((m) => m.type)).toEqual(['image/png'])
+  })
+})

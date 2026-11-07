@@ -141,3 +141,12 @@ describe('fromBitPositions', () => {
     expect(fromBitPositions('37')).toBeNull()
   })
 })
+
+describe('large unit values', () => {
+  it('get thousands separators', () => {
+    const v = (id) => sizeRows(1610612736).find((x) => x.id === id)?.value
+    expect(v('KB')).toBe('1,610,613 KB')
+    expect(v('KiB')).toBe('1,572,864 KiB')
+    expect(v('MiB')).toBe('1,536 MiB')
+  })
+})

@@ -1,7 +1,7 @@
 import { copyItem, preview, historyItems } from '../../core/extensions/host.js'
 import { parseBasesCommand, parseInteger, baseRows, setBits, parseSize, sizeRows, evalBits, fromBitPositions, basesFill } from './engine.js'
 
-const ICON = 'iconify:fa6-solid:binary'
+const ICON = 'iconify:fa6-solid:microchip'
 const RADIX = { hex: 16, bin: 2, oct: 8, dec: 10 }
 const NAME = { hex: 'hexadecimal', bin: 'binary', oct: 'octal', dec: 'decimal' }
 

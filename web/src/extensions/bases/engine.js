@@ -95,7 +95,7 @@ export function parseSize(text) {
   return Number.isFinite(n) && n <= Number.MAX_SAFE_INTEGER ? Math.round(n) : null
 }
 
-const trim = (n) => (n >= 100 ? n.toFixed(0) : n >= 10 ? n.toFixed(1) : n.toFixed(2)).replace(/\.?0+$/, '')
+const trim = (n) => (n >= 1000 ? Math.round(n).toLocaleString('en-US') : (n >= 100 ? n.toFixed(0) : n >= 10 ? n.toFixed(1) : n.toFixed(2)).replace(/\.?0+$/, ''))
 const human = (bytes, table) => {
   let best = [`B`, 1]
   for (const e of table) if (bytes >= e[1]) best = e

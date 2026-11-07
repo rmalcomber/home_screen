@@ -8,7 +8,7 @@ export default {
       kind: 'tool-bases',
       name: 'Number base converter',
       category: 'Calculators & converters',
-      icon: 'iconify:fa6-solid:binary',
+      icon: 'iconify:fa6-solid:microchip',
       description: 'A number in decimal, hex, binary, octal and base 36 (type 255, 0xff, 0b1010, or 16 ff).',
       size: [4, 14],
       host: { provider: 'bases', prefix: 'base', input: 'line', placeholder: 'e.g. 255, 0xff, 0b1010, or 16 ff for base 16', default: '255', hint: 'Type a number above (255, 0xff, 0b1010).' },

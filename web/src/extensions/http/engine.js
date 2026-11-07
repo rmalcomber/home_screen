@@ -71,7 +71,9 @@ export function lookupHeader(text, limit = 8) {
     else if (words(t).every((w) => norm(h[2]).includes(w))) score = 10
     if (score) scored.push([score, h])
   }
-  return scored.sort((a, b) => b[0] - a[0] || (a[1][0] < b[1][0] ? -1 : 1)).slice(0, limit).map(([, h]) => toHeader(h))
+  const best = Math.max(0, ...scored.map(([s]) => s))
+  // when some header names match, leave out the ones that only match in their description
+  return scored.filter(([s]) => best < 40 || s >= 40).sort((a, b) => b[0] - a[0] || (a[1][0] < b[1][0] ? -1 : 1)).slice(0, limit).map(([, h]) => toHeader(h))
 }
 
 const toMime = ([exts, type, description]) => ({ exts, type, description })
@@ -92,7 +94,8 @@ export function lookupMime(text, limit = 10) {
     else if (words(t).every((w) => norm(description).includes(w))) score = 20
     if (score) scored.push([score, m])
   }
-  return scored.sort((a, b) => b[0] - a[0]).slice(0, limit).map(([, m]) => toMime(m))
+  const best = Math.max(0, ...scored.map(([s]) => s))
+  return scored.filter(([s]) => best < 30 || s >= 30).sort((a, b) => b[0] - a[0]).slice(0, limit).map(([, m]) => toMime(m))
 }
 
 export const statusUrl = (code) => `https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/${code}`
