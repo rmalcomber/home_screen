@@ -392,14 +392,16 @@ home_screen/
 ├─ .github/workflows/        docs.yml (GitHub Pages) and release.yml (binaries, GitHub release, Docker image)
 └─ web/                      Preact + Tailwind + DaisyUI (theme: dim), built with Vite
    └─ src/
-      ├─ app.jsx, store.js, util.js        shell, state (signals: tiles, pages), grid maths, bookmark parsing
-      ├─ layout.js, colors.js, templates.js  layout engine (groups, columns, auto-arrange), tile palette, starter templates
-      ├─ components/                       Grid, TileEditor, IconPicker, ImportBookmarks, SettingsDialog, ColorTool…
-      ├─ tiles/                            tile bodies and widgets (widgets.jsx, widgets_extra.jsx)
-      └─ launcher/                         the launcher
-         ├─ registry.js, providers.js      provider registry and the built-in providers
-         ├─ Launcher.jsx, history.js       the UI and per-feature history
-         └─ calc / convert / currency / curl / json / base64 / jwt / uuid / hash / regex / color / lorem / timestamp / diff / cron / csv  (+ panels)
+      ├─ core/                             the app itself, always loaded
+      │  ├─ app.jsx, store.js, util.js     shell, state (signals: tiles, pages), grid maths, bookmark parsing
+      │  ├─ layout.js, colors.js, templates.js  layout engine, tile palette, starter templates
+      │  ├─ ui/                            Grid, TileEditor, WidgetPicker, IconPicker, SettingsDialog…
+      │  ├─ tiles/                         built-in tile types: bookmarks, developer, GitHub, group
+      │  ├─ launcher/                      the launcher window, history, and the Links and Commands providers
+      │  ├─ extensions/                    extension runtime: registry, loader, host API
+      │  └─ lib/                           pure helpers shared by extensions (JSON, colour, text)
+      └─ extensions/                       one folder per widget or launcher tool, loaded on demand
+         └─ cron/                          manifest.js, index.js, engine.js, tool.js, Panel.jsx
 ```
 
 Stack: Rust, a small hand-written HTTP server and client on `std::net`, rusqlite (bundled SQLite, trimmed), native-tls; the web app is gzipped at build time and embedded with `build.rs`; Preact with signals, Tailwind CSS 4, DaisyUI 5. Release builds are size-optimised (`opt-level = "z"`, LTO, stripped).
@@ -408,47 +410,23 @@ Stack: Rust, a small hand-written HTTP server and client on `std::net`, rusqlite
 
 ## Extending it
 
-### Add a widget
-
-Widgets are registered in `web/src/tiles/widgets.jsx` / `widgets_extra.jsx`. An entry looks like:
+Widgets and launcher tools are **extensions**: one folder in `web/src/extensions/` with a manifest (what it is), an entry (its code, loaded on demand), and an engine (the logic, as pure functions). A launcher tool that also makes sense as a dashboard tile is a few lines in the manifest.
 
 ```js
-const myWidget = {
-  label: 'My widget',
-  size: [3, 8],                       // default grid width and height
-  defaults: { kind: 'mine' },         // initial config
-  Body({ tile }) { /* render using tile.config */ },
-  Options({ config, set }) { /* editor fields; call set({ ... }) */ },
+// web/src/extensions/hello/manifest.js
+export default {
+  id: 'hello',
+  name: 'Hello',
+  tool: { id: 'hello', name: 'Hello', order: 20 },   // a launcher tool
+  widgets: [{                                        // and a dashboard widget
+    kind: 'tool-hello', name: 'Hello', category: 'Developer tools',
+    icon: 'iconify:fa6-solid:hand', description: 'Says hello to whatever you type.', size: [3, 6],
+    host: { provider: 'hello', prefix: 'hello', input: 'line', placeholder: 'e.g. hello world' },
+  }],
 }
 ```
 
-Add it to the `WIDGETS` export and it appears in the tile editor.
-
-### Add a launcher feature
-
-Launcher features are *providers* registered in `web/src/launcher/providers.js` (see the header of `registry.js`):
-
-```js
-registerProvider({
-  id: 'demo',
-  name: 'Demo',
-  prefix: '!',          // optional: typing this first character scopes the launcher to this provider
-  filter: false,        // false if the provider does its own matching (default: results are fuzzy-ranked)
-  async items(query) {
-    return [{
-      key: 'demo:1',                    // stable id (used for Recent)
-      title: 'Hello', subtitle: 'World', kind: 'Demo',
-      icon: 'iconify:fa6-solid:star',   // or iconSrc: 'https://…'
-      run({ newTab }) { /* Enter / click */ },
-    }]
-  },
-})
-```
-
-Two extras for richer features:
-
-- **`panel`**: return an item with `panel: MyComponent` (and `data`, `hint`) to take over the results area with your own UI, as the curl, JSON, JWT and regex features do.
-- **History**: call `remember(kind, { key, title, subtitle, fill })` from `launcher/history.js` when the user copies or runs something. It then shows under Recent, and choosing it puts `fill` back into the launcher box. Return `historyItems(kind, badge, icon)` from `items('')` so it can be listed.
+The full guide, with the tool, engine and entry files for this example, custom widgets, the host API and the import rules the tests enforce, is in the docs: **Reference, Extending Home Screen** (`docs/src/content/docs/reference/extending.md`).
 
 ---
 

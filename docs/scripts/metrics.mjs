@@ -9,7 +9,7 @@ import { readFileSync, writeFileSync, readdirSync, statSync, mkdirSync, mkdtempS
 import { gzipSync } from 'node:zlib'
 import { tmpdir, platform, cpus, totalmem } from 'node:os'
 import { join, resolve, dirname } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const root = resolve(here, '../..')
@@ -65,18 +65,22 @@ m.direct_deps = (cargo.split(/^\[dependencies\]/m)[1].split(/^\[/m)[0].match(/^[
 m.runtime_npm = Object.keys(JSON.parse(read(join(root, 'web', 'package.json'))).dependencies).length
 const rs = walk(join(root, 'src'), (p) => p.endsWith('.rs'))
 const web = walk(join(root, 'web', 'src'), (p) => /\.(jsx?|css)$/.test(p))
-const tests = web.filter((p) => /\.test\.js$/.test(p))
+const tests = web.filter((p) => /\.test\.jsx?$/.test(p))
 m.rust_loc = lines(rs)
 m.web_loc = lines(web.filter((p) => !tests.includes(p)))
 m.test_loc = lines(tests)
 m.rust_tests = rs.reduce((n, f) => n + (read(f).match(/#\[test\]/g) || []).length, 0)
 
-// ---- widgets and tools (counted from the source, not remembered)
-const widgetsTools = read(join(root, 'web', 'src', 'tiles', 'widgets_tools.jsx'))
-const toolWidgets = (widgetsTools.match(/^\s*\{ kind: '/gm) || []).length
-const classic = (read(join(root, 'web', 'src', 'tiles', 'catalog.js')).match(/^\s{2}[a-z]+: \{ category:/gm) || []).length
-m.widgets = classic + toolWidgets
-m.tools = 19 // calculator, units, currency, timestamp, curl, JSON, CSV, regex, diff, cron, Markdown, password, hash, base64, UUID, JWT, QR, colour, lorem
+// ---- widgets and tools (counted from the extension manifests, not remembered)
+const extDir = join(root, 'web', 'src', 'extensions')
+const manifests = []
+for (const d of readdirSync(extDir, { withFileTypes: true }).filter((e) => e.isDirectory())) {
+  manifests.push((await import(pathToFileURL(join(extDir, d.name, 'manifest.js')).href)).default)
+}
+m.extensions = manifests.length
+m.widgets = manifests.reduce((n, e) => n + (e.widgets || []).length, 0)
+// A launcher tool is each extension tool; the calculator extension counts three (maths, units, currency).
+m.tools = manifests.filter((e) => e.tool).reduce((n, e) => n + Math.max(1, (e.widgets || []).filter((w) => w.host).length), 0)
 m.launcher_features = m.tools + 2 // plus search and commands
 
 // ---- tests (runs the real suite)

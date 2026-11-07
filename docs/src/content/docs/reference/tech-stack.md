@@ -42,6 +42,10 @@ The server has {{metric.direct_deps}} direct dependencies and {{metric.crates}} 
 
 Only {{metric.runtime_npm}} npm packages ship in the web interface. The rest of the launcher, from the calculator and unit converter to the cron parser, diff, regex and colour maths, is written in plain JavaScript in this repository: about {{metric.web_loc}} lines.
 
+### Core and extensions
+
+The web source is split in two. `web/src/core/` is the app itself: the grid, tile editor, launcher window and state. `web/src/extensions/` holds {{metric.extensions}} extensions, one folder each, that provide the {{metric.widgets}} widgets and {{metric.tools}} launcher tools. Each extension has a manifest, an entry, and an engine of pure functions. The build makes every extension its own file, and the browser fetches it the first time a tile or the launcher needs it, so a dashboard of notes and bookmarks never downloads the cron parser, the QR encoder or the Markdown tokenizer. All the files are still embedded in the program. How to add one: [Extending Home Screen](/reference/extending/).
+
 ## How it is built
 
 On Windows, `build.ps1` does two things (on Linux and macOS you run the same two commands by hand):
