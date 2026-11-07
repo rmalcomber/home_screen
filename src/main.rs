@@ -1,41 +1,46 @@
 mod api;
 mod db;
+mod http_client;
+mod server;
 
-use axum::{
-    http::{header, StatusCode, Uri},
-    response::{IntoResponse, Response},
-    routing::{get, post, put},
-    Router,
-};
-use rust_embed::RustEmbed;
+use server::{Request, Response};
+use std::net::TcpListener;
 use std::sync::{Arc, Mutex};
 
-#[derive(RustEmbed)]
-#[folder = "web/dist/"]
-struct Assets;
+// The web app, gzipped by web/scripts/pack.mjs and embedded by build.rs: `ASSETS: &[(name, gzip bytes)]`.
+include!(concat!(env!("OUT_DIR"), "/assets.rs"));
+
+fn asset(name: &str) -> Option<&'static [u8]> {
+    ASSETS.iter().find(|(n, _)| *n == name).map(|(_, b)| *b)
+}
 
 pub type Shared = Arc<Mutex<rusqlite::Connection>>;
 
-async fn static_files(uri: Uri) -> Response {
-    let path = uri.path().trim_start_matches('/');
+/// The web app. Single-page: unknown paths get index.html. Everything is stored gzipped and sent as it is, so a
+/// client that does not accept gzip (a bare `curl`) is told how to ask for it instead of being sent bytes it cannot read.
+fn static_files(req: &Request) -> Response {
+    if req.method != "GET" && req.method != "HEAD" {
+        return Response::new(405).with("Allow", "GET, HEAD");
+    }
+    let accepts_gzip = req.header("accept-encoding").is_some_and(|v| v.to_ascii_lowercase().contains("gzip"));
+    if !accepts_gzip {
+        return Response::new(406).bytes("text/plain; charset=utf-8", b"Home Screen sends its pages gzip-compressed. Use a browser, or curl --compressed.\n".to_vec());
+    }
+    let path = req.path.trim_start_matches('/');
     let path = if path.is_empty() { "index.html" } else { path };
-    let (file, name) = match Assets::get(path) {
+    let (data, name) = match asset(path) {
         Some(f) => (f, path),
-        None => match Assets::get("index.html") {
+        None => match asset("index.html") {
             Some(f) => (f, "index.html"),
-            None => return StatusCode::NOT_FOUND.into_response(),
+            None => return Response::new(404),
         },
     };
-    let cache = if name == "index.html" {
-        "no-cache"
-    } else {
-        "public, max-age=31536000, immutable"
-    };
-    (
-        [(header::CONTENT_TYPE, mime_for(name)), (header::CACHE_CONTROL, cache)],
-        file.data.into_owned(),
-    )
-        .into_response()
+    let cache = if name == "index.html" { "no-cache" } else { "public, max-age=31536000, immutable" };
+    Response::new(200)
+        .static_bytes(mime_for(name), data)
+        .with("Cache-Control", cache)
+        .with("Content-Encoding", "gzip")
+        .with("Vary", "Accept-Encoding")
 }
 
 fn mime_for(name: &str) -> &'static str {
@@ -61,8 +66,7 @@ fn setting(flag: &str, env: &str) -> Option<String> {
     arg(flag).or_else(|| std::env::var(env).ok().filter(|v| !v.trim().is_empty()))
 }
 
-#[tokio::main]
-async fn main() {
+fn main() {
     let port: u16 = setting("--port", "PORT")
         .and_then(|p| p.parse().ok())
         .unwrap_or(7878);
@@ -79,29 +83,17 @@ async fn main() {
     let conn = db::open(&db_path).expect("open database");
     let state: Shared = Arc::new(Mutex::new(conn));
 
-    let app = Router::new()
-        .route("/api/tiles", get(api::list_tiles).post(api::create_tile))
-        .route("/api/tiles/{id}", put(api::update_tile).delete(api::delete_tile))
-        .route("/api/layout", put(api::save_layout))
-        .route("/api/pages", get(api::list_pages).post(api::create_page))
-        .route("/api/pages/{id}", put(api::update_page).delete(api::delete_page))
-        .route("/api/icons", get(api::list_icons).post(api::add_icon))
-        .route("/api/icons/{id}", get(api::get_icon).delete(api::delete_icon))
-        .route("/api/images", post(api::add_image))
-        .route("/api/images/{id}", get(api::get_image).delete(api::delete_image))
-        .route("/api/run", post(api::run))
-        .route("/api/settings", get(api::get_settings).put(api::put_settings))
-        .fallback(static_files)
-        .layer(axum::extract::DefaultBodyLimit::max(8 * 1024 * 1024))
-        .with_state(state);
-
     // Loopback only by default: there is no sign-in. Containers set --host 0.0.0.0 (HOME_SCREEN_HOST).
     let host = setting("--host", "HOME_SCREEN_HOST").unwrap_or_else(|| "127.0.0.1".into());
     let addr = if host.contains(':') { format!("[{host}]:{port}") } else { format!("{host}:{port}") };
-    let listener = tokio::net::TcpListener::bind(&addr).await.unwrap_or_else(|e| {
+    let listener = TcpListener::bind(&addr).unwrap_or_else(|e| {
         eprintln!("Cannot bind {addr}: {e}");
         std::process::exit(1);
     });
     println!("Home Screen running at http://localhost:{port}  (db: {db_path})");
-    axum::serve(listener, app).await.unwrap();
+
+    let handler: Arc<server::Handler> = Arc::new(move |req: &Request| {
+        if req.path == "/api" || req.path.starts_with("/api/") { api::handle(req, &state) } else { static_files(req) }
+    });
+    server::serve(listener, handler, server::Limits::default());
 }

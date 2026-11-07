@@ -4,13 +4,9 @@ version = "0.2.0-beta"
 edition = "2021"
 
 [dependencies]
-axum = { version = "0.8", default-features = false, features = ["http1", "tokio", "json", "query"] }
-tokio = { version = "1", features = ["rt-multi-thread", "net", "macros"] }
 rusqlite = { version = "0.32", features = ["bundled"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-rust-embed = { version = "8", features = ["compression"] }
-ureq = { version = "2", default-features = false, features = ["native-tls"] }
 native-tls = "0.2"
 
 # Linux has no OS TLS library to lean on, so OpenSSL is compiled in (vendored). That keeps the Linux and

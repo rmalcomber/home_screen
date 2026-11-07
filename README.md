@@ -352,7 +352,7 @@ Requirements: **Rust** (stable, MSVC toolchain), **Node.js** 18+ (only to build 
 .\build.ps1
 ```
 
-This runs `npm ci && npm run build` in `web/`, then `cargo build --release`, and copies the result to `dist\home_screen.exe`. The web app is embedded into the exe at compile time (`rust-embed`), so the exe is fully self-contained: SQLite is bundled and TLS uses Windows' own certificate store.
+This runs `npm ci && npm run build` in `web/`, then `cargo build --release`, and copies the result to `dist\home_screen.exe`. The web app is embedded into the exe at compile time (gzipped by `web/scripts/pack.mjs`, included by `build.rs`), so the exe is fully self-contained: SQLite is bundled and TLS uses Windows' own certificate store.
 
 If copying fails because the exe is in use, stop the running app first.
 
@@ -379,12 +379,15 @@ cd web; npm test        # parsers, converters, launcher logic (Vitest)
 
 ```
 home_screen/
-├─ Cargo.toml, build.ps1, Dockerfile
+├─ Cargo.toml, build.rs, build.ps1, Dockerfile, .cargo/config.toml (SQLite build flags)
+├─ scripts/size-report.mjs   where the bytes in the exe come from
 ├─ docker/                   Compose files (plain, and behind Caddy with basic auth)
-├─ src/                      Rust server (axum + rusqlite)
-│  ├─ main.rs                routes, embedded static files, CLI args
+├─ src/                      Rust server (own HTTP server + rusqlite)
+│  ├─ main.rs                static files, CLI args, start-up
+│  ├─ server.rs              HTTP/1.1 server on std::net (+ tests over real sockets)
+│  ├─ http_client.rs         HTTP/1.1 client for the curl runner (+ tests)
 │  ├─ db.rs                  schema, queries, SVG sanitiser (+ tests)
-│  └─ api.rs                 JSON handlers, image/icon storage, curl runner
+│  └─ api.rs                 router and JSON handlers, image/icon storage, curl runner
 ├─ docs/                     documentation site (Astro + Starlight, all content in Markdown)
 ├─ .github/workflows/        docs.yml (GitHub Pages) and release.yml (binaries, GitHub release, Docker image)
 └─ web/                      Preact + Tailwind + DaisyUI (theme: dim), built with Vite
@@ -399,7 +402,7 @@ home_screen/
          └─ calc / convert / currency / curl / json / base64 / jwt / uuid / hash / regex / color / lorem / timestamp / diff / cron / csv  (+ panels)
 ```
 
-Stack: Rust, axum, rusqlite (bundled SQLite), rust-embed, ureq (native TLS); Preact with signals, Tailwind CSS 4, DaisyUI 5. Release builds are size-optimised (`opt-level = "z"`, LTO, stripped).
+Stack: Rust, a small hand-written HTTP server and client on `std::net`, rusqlite (bundled SQLite, trimmed), native-tls; the web app is gzipped at build time and embedded with `build.rs`; Preact with signals, Tailwind CSS 4, DaisyUI 5. Release builds are size-optimised (`opt-level = "z"`, LTO, stripped).
 
 ---
 
