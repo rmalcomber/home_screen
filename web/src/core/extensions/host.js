@@ -20,4 +20,4 @@ export * from '../lib/color.js'
 export { Field, copyText, CopyButton } from './ui.jsx'
 
 // Launcher result helpers
-export { copyItem, preview } from './items.js'
+export { copyItem, openItem, preview } from './items.js'

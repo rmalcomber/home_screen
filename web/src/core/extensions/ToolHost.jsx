@@ -79,7 +79,7 @@ export function ToolHost({ extension, def }) {
                     <span class={`block text-sm break-all line-clamp-3 ${it.mono || def.provider !== 'calc' ? 'font-mono' : 'font-semibold'}`}>{it.title}</span>
                     {it.subtitle && <span class="block text-xs opacity-60 truncate">{it.subtitle.replace(/\s*·\s*Enter to copy$/, '')}</span>}
                   </span>
-                  <span class="text-xs opacity-60 shrink-0 mt-0.5">{flash === it.key ? (it.verb ? 'Opened ✓' : 'Copied ✓') : it.verb || 'Copy'}</span>
+                  {it.kind !== 'Info' && it.kind !== 'Error' && <span class="text-xs opacity-60 shrink-0 mt-0.5">{flash === it.key ? (it.verb ? 'Opened ✓' : 'Copied ✓') : it.verb || 'Copy'}</span>}
                 </button>
               </li>
             ))}
