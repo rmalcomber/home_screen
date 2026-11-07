@@ -16,7 +16,8 @@ Every release page mirrors its GitHub release, which is where the downloads are 
 
 | Version | Status | Highlights |
 |---|---|---|
-| [0.2.0-beta](/releases/v0.2.0-beta/) | Latest beta | Groups, colours, pages, layout modes, auto-arrange, starter templates |
+| [0.2.1-beta](/releases/v0.2.1-beta/) | Latest beta | A 1.0 MB Windows binary: 55% smaller, no behaviour change you will notice in the app |
+| [0.2.0-beta](/releases/v0.2.0-beta/) | Previous beta | Groups, colours, pages, layout modes, auto-arrange, starter templates |
 | [0.1.0-beta](/releases/v0.1.0-beta/) | First beta | Dashboard, launcher with {{metric.tools}} tools, {{metric.widgets}} widgets, a {{metric.exe_size}} binary |
 
 ## How versions work
