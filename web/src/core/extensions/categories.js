@@ -6,4 +6,5 @@ export const CATEGORIES = [
   'Calculators & converters',
   'Security & encoding',
   'Developer tools',
+  'Web & network',
 ]

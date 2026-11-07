@@ -108,7 +108,7 @@ describe('launcher tools', () => {
     for (const t of TOOLS) expect(ids, t.id).toContain(t.id)
     expect(ids.slice(0, TOOLS.length)).toEqual(TOOLS.map((t) => t.id))
     expect(ids.slice(TOOLS.length)).toEqual(['links', 'commands'])
-    expect(TOOLS.map((t) => t.id)).toEqual(['curl', 'json', 'b64', 'jwt', 'uuid', 'hash', 'regex', 'color', 'lorem', 'ts', 'diff', 'cron', 'csv', 'password', 'qr', 'md', 'calc'])
+    expect(TOOLS.map((t) => t.id)).toEqual(['curl', 'json', 'b64', 'jwt', 'uuid', 'hash', 'regex', 'color', 'lorem', 'ts', 'diff', 'cron', 'csv', 'password', 'qr', 'md', 'calc', 'url', 'case', 'bases', 'chmod'])
   })
 
   it('answer through the loaded extension', async () => {

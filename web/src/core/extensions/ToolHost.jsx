@@ -74,12 +74,12 @@ export function ToolHost({ extension, def }) {
           <ul class="grid grid-cols-[minmax(0,1fr)] gap-0.5">
             {items.map((it) => (
               <li key={it.key}>
-                <button type="button" class="w-full flex items-start gap-2 px-2 py-1 rounded text-left hover:bg-base-300" onClick={() => run(it)} title="Click to copy">
+                <button type="button" class="w-full flex items-start gap-2 px-2 py-1 rounded text-left hover:bg-base-300" onClick={() => run(it)} title={`Click to ${(it.verb || 'Copy').toLowerCase()}`}>
                   <span class="min-w-0 flex-1">
                     <span class={`block text-sm break-all line-clamp-3 ${it.mono || def.provider !== 'calc' ? 'font-mono' : 'font-semibold'}`}>{it.title}</span>
                     {it.subtitle && <span class="block text-xs opacity-60 truncate">{it.subtitle.replace(/\s*·\s*Enter to copy$/, '')}</span>}
                   </span>
-                  <span class="text-xs opacity-60 shrink-0 mt-0.5">{flash === it.key ? 'Copied ✓' : 'Copy'}</span>
+                  <span class="text-xs opacity-60 shrink-0 mt-0.5">{flash === it.key ? (it.verb ? 'Opened ✓' : 'Copied ✓') : it.verb || 'Copy'}</span>
                 </button>
               </li>
             ))}
