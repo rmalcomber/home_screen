@@ -15,9 +15,10 @@ The goal was a Windows executable small enough for a 1.44 MB floppy disk (1,474,
 | Our own HTTP client for the curl runner | 1,455,104 | 253,952 |
 | Our own HTTP server | 1,089,536 | 365,568 |
 | Fewer daisyUI styles, a few more SQLite options | 1,063,936 | 25,600 |
-| Web app split into lazy-loaded extensions | **1,083,392** | -19,456 (larger) |
+| Web app split into lazy-loaded extensions | 1,083,392 | -19,456 (larger) |
+| Ten more launcher tools, as extensions | **1,129,472** | -46,080 (larger) |
 
-That is **54% smaller**, and about 391,000 bytes under the floppy limit. The numbers are for the 64-bit Windows build made by `build.ps1`. The last step makes the program slightly larger on purpose: it is the price of splitting the web app into 29 separate scripts (see below), which makes the first page load much lighter.
+That is **52% smaller**, and about 345,000 bytes under the floppy limit. The numbers are for the 64-bit Windows build made by `build.ps1`. The last two steps make the program larger on purpose: splitting the web app into separate scripts (see below) makes the first page load much lighter, and the ten new tools are new code.
 
 ## What is in it now
 
@@ -25,14 +26,14 @@ That is **54% smaller**, and about 391,000 bytes under the floppy limit. The num
 
 | Part | Size | Share |
 |---|---:|---:|
-| SQLite (C) | 523 KB | 52% |
-| The web app and other constants and strings | 194 KB | 19% |
+| SQLite (C) | 523 KB | 49% |
+| The web app and other constants and strings | 239 KB | 22% |
 | Home Screen's own code | 94 KB | 9% |
-| The Rust standard library (`core`, `std`, `alloc`) | 100 KB | 10% |
+| The Rust standard library (`core`, `std`, `alloc`) | 100 KB | 9% |
 | `serde_json` | 22 KB | 2% |
-| Everything else (TLS bindings, Windows imports, panic and unwind tables, 18 small crates) | about 85 KB | 9% |
+| Everything else (TLS bindings, Windows imports, panic and unwind tables, 18 small crates) | about 85 KB | 8% |
 
-More than half the program is the database engine. The rest of what remains is mostly needed: the interface itself (about 148 KB of gzipped JavaScript and CSS), the standard library and the JSON code.
+More than half the program is the database engine. The rest of what remains is mostly needed: the interface itself (about 190 KB of gzipped JavaScript and CSS, in 41 files), the standard library and the JSON code.
 
 ## What changed, and what it cost
 
@@ -44,7 +45,7 @@ More than half the program is the database engine. The rest of what remains is m
 
 **The server.** axum, hyper, tokio, tower and about thirty supporting crates served about fifteen routes on a local port. `src/server.rs` is about 400 lines on `std::net`: a thread per connection, keep-alive, and deliberately narrow parsing. It refuses chunked uploads, duplicate or non-numeric `Content-Length`, folded headers, bare line feeds, control characters and unknown HTTP versions. It limits the request line and headers to 16 KB, the body to 8 MiB, connections to 64, idle time to 30 seconds and the time to deliver a request to 15 seconds. A suite of tests over real sockets covers every one of those limits. JSON requests must still be sent as `application/json`, which is what stops other websites from posting to the API.
 
-**The web app in pieces.** Widgets and launcher tools are now [extensions](/reference/extending/), and each one is its own JavaScript file that the browser fetches when it is first needed. The file every page loads shrank from 321 KB to 113 KB (110 KB to 39 KB gzipped). The program grew by about 19 KB, because 29 small files compress a little worse than one large one (each is gzipped on its own) and each carries a few bytes of overhead. The cost: a few extra requests the first time a widget or the launcher is used, all served from the program itself.
+**The web app in pieces.** Widgets and launcher tools are now [extensions](/reference/extending/), and each one is its own JavaScript file that the browser fetches when it is first needed. The file every page loads shrank from 321 KB to 122 KB (110 KB to 42 KB gzipped), even with ten more tools added since. The split itself made the program about 19 KB larger, because small files compress a little worse than one large one (each is gzipped on its own) and each carries a few bytes of overhead; the ten new tools added 46 KB more. The cost: a few extra requests the first time a widget or the launcher is used, all served from the program itself.
 
 **The styles.** daisyUI emits the CSS for every component it ships. The ones nothing uses are now excluded, and `npm run audit:css` (part of the release workflow) fails if a class the interface uses is ever dropped.
 

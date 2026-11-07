@@ -30,13 +30,13 @@ By default Home Screen binds to `127.0.0.1` only. It is **not** reachable from o
 
 ### Reaching it through a proxy or another name
 
-The [curl runner](/launcher/curl/) makes requests from the server, so it only accepts calls from a page opened via `localhost`, `127.0.0.1` or `[::1]`. That stops other websites, including DNS-rebinding tricks, from using it. If you open Home Screen by another name (a reverse proxy at `home.example.com`, or `nas.lan`), list that name:
+The [curl runner](/launcher/curl/) and the [Open Graph viewer](/launcher/open-graph/) make requests from the server, so it only accepts calls from a page opened via `localhost`, `127.0.0.1` or `[::1]`. That stops other websites, including DNS-rebinding tricks, from using it. If you open Home Screen by another name (a reverse proxy at `home.example.com`, or `nas.lan`), list that name:
 
 ```bash
 home_screen --host 0.0.0.0 --allowed-hosts home.example.com,nas.lan
 ```
 
-Names are matched without the port. Everything else in Home Screen works under any name; only the curl runner is restricted. The proxy must pass the original `Host` header through, which Caddy and nginx's `proxy_set_header Host $host` do.
+Names are matched without the port. Everything else in Home Screen works under any name; only the curl runner and the Open Graph viewer (which uses the same fetcher) are restricted. The proxy must pass the original `Host` header through, which Caddy and nginx's `proxy_set_header Host $host` do.
 
 ## Where things are stored
 

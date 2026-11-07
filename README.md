@@ -88,7 +88,7 @@ Create one from **☰ → + Add tile**. Pick a type, give it a title and an opti
 
 **Adding a widget.** In **☰ → + Add tile** choose **Widget**. A picker lists every widget with an icon and a one-line description. Browse by category (*Time & weather*, *Notes & tasks*, *Media & design*, *Calculators & converters*, *Security & encoding*, *Developer tools*) or search across all of them. Picking one fills in the **title and icon** for you (type or choose your own to override) and shows that widget's settings, if it has any, underneath.
 
-**Every launcher tool is also a widget.** These host the same engine as the launcher, with a text box on top and the result below; click a result to copy it. They are: Calculator, Unit converter, Currency converter, Timestamp converter, Cron explainer, Lorem ipsum, Markdown previewer, QR code generator, Password generator, Hash generator, Base64, UUID generator, JWT decoder, Curl runner, JSON formatter, Regex tester, Text diff and CSV ⇄ JSON (the colour tool is the Colour picker widget above). Generators have a ↻ button to make new values. What you type into a tool widget is **not saved** (it can contain tokens, JSON or commands), so the box is empty after a reload. Keyboard shortcuts in a tool widget only apply while focus is inside that widget, and they use **Ctrl+Enter** rather than plain Enter, which stays free for typing.
+**Every launcher tool is also a widget.** These host the same engine as the launcher, with a text box on top and the result below; click a result to copy it. They are: Calculator, Unit converter, Currency converter, Timestamp converter, Cron explainer, Lorem ipsum, Markdown previewer, QR code generator, Password generator, Hash generator, Base64, UUID generator, JWT decoder, Curl runner, JSON formatter, Regex tester, Text diff, CSV ⇄ JSON, URL encoder and parser, HTML entities, JSON ⇄ YAML and JSON ⇄ TOML converters, Number base converter, Byte size converter, Bit calculator, chmod and umask calculators, Text case converter, Word and line counter, IP and CIDR calculator, HTTP status codes, HTTP headers, MIME types, Open Graph viewer, Web search and Can I use (the colour tool is the Colour picker widget above). Generators have a ↻ button to make new values. What you type into a tool widget is **not saved** (it can contain tokens, JSON or commands), so the box is empty after a reload. Keyboard shortcuts in a tool widget only apply while focus is inside that widget, and they use **Ctrl+Enter** rather than plain Enter, which stays free for typing.
 
 **Several clocks or places.** The Clock and Weather widgets can show many time zones or cities at once, either as a stacked **list** or as **mini tiles** laid out side by side (wrapping onto further rows when the tile is narrow). Choose the layout under *Layout when there is more than one* in the widget's settings; with a single zone or place the widget shows the large single view.
 
@@ -295,6 +295,23 @@ Copied conversions appear in Recent; reopening one re-runs it (so `now` is the c
 
 `Enter` copies the HEX. Copied colours go to Recent with a colour swatch; choosing one reopens it.
 
+### More tools
+
+Each of these is also a widget. Full pages with every option are in the docs under *The launcher*.
+
+| Type | You get |
+|---|---|
+| `url <text>`, `urlencode`, `urldecode`, `html <text>`, `qs <url>` | URL and HTML encoding and decoding; a URL or query string parsed into a table of parts and decoded parameters |
+| `yaml <text>`, `toml <text>`, `json2yaml`, `yaml2json`, `json2toml`... | JSON, YAML and TOML in any direction, with the format detected and errors that name the line. Anchors, tags, merge keys and multi-document YAML are refused with a message |
+| `hex ff`, `bin 1010`, `base 36 zz`, `0xFF`, `bytes 1.5 GiB`, `bits 0xF0 & 0x3C` | Numbers in every base (exact big integers, two's complement for negatives), sizes in SI and IEC units, and bit expressions with the set bits |
+| `10.0.0.0/24`, `cidr 10.0.0.5 in 10.0.0.0/24`, `cidr a overlaps b`, `cidr 10.0.0.0/24 split 26` | IPv4 and IPv6 network details, membership, overlap and subnet splitting |
+| `chmod 755`, `chmod rwxr-xr-x`, `chmod 644 u+x`, `umask 022` | A permission editor with a grid of boxes, octal and symbolic forms and a copyable command |
+| `snake <text>`, `camel`, `kebab`, `title`, `slug`, `case`, `count` / `wc` | Every case spelling of a phrase or identifier, URL slugs, and word, line and reading-time counts |
+| `status 404`, `status not found`, `header content-type`, `mime png` | HTTP status codes, headers and media types, built in |
+| `og <url>` | Open Graph viewer: press Enter to fetch the page through your server and see the preview card, every `og:` and `twitter:` tag and what is missing |
+| `google <text>`, `ddg`, `github`, `youtube`, `mdn`, `search <text>` and about twenty more | Opens that search in a new tab; `search` lists every engine |
+| `caniuse grid`, `ciu flexbox gap` | Browser support from the public Can I use data, downloaded once and kept in your browser |
+
 ---
 
 ## Keyboard shortcuts
@@ -334,12 +351,14 @@ External services contacted by your browser, only when the feature is used:
 | `www.google.com/s2/favicons` | Link favicons (reveals the domains of your bookmarks to Google) |
 | `api.open-meteo.com`, `geocoding-api.open-meteo.com` | Weather widget |
 | `api.frankfurter.dev` | Currency rates |
+| `raw.githubusercontent.com` | The Can I use data (downloaded once, kept in your browser) |
+| The site you look up | The preview picture in the Open Graph viewer, after you press Fetch |
 
 Things to be aware of:
 
 - **The curl runner makes requests from your machine**, with whatever URL, headers and credentials are in the command. The `/api/run` endpoint only accepts requests from this page opened via `localhost` or `127.0.0.1`: other websites (including DNS-rebinding tricks) get a `403`. It follows redirects only with `-L` and checks TLS certificates unless the command has `-k`.
 - **Saved launcher history can contain secrets.** Curl commands (headers, tokens, URLs with keys) and JWTs are stored in plain text in your browser's local storage so they can appear in Recent. Clear it from Chrome's site data for `localhost:7878` if needed.
-- JWTs, base64, hashes and JSON are processed entirely in your browser. They are not sent to the server.
+- JWTs, base64, hashes, JSON, YAML and the other tools are processed entirely in your browser. They are not sent to the server, except the address you give the curl runner or the Open Graph viewer (which fetch pages from the server), and web search shortcuts, which open the engine you pick when you press Enter.
 - Uploaded SVG icons are sanitised and served with a restrictive content-security policy; image uploads accept raster formats only.
 
 ---

@@ -19,8 +19,9 @@ Press <kbd>Ctrl</kbd>+<kbd>P</kbd> (or <kbd>Ctrl</kbd>+<kbd>K</kbd>, or **☰ �
 | Group | Tools |
 |---|---|
 | **Search and commands** | [Search everything](/launcher/search/) · [Commands](/launcher/commands/) |
-| **Calculators and converters** | [Calculator](/launcher/calculator/) · [Units](/launcher/units/) · [Currency](/launcher/currency/) · [Timestamps](/launcher/timestamp/) |
-| **Developer tools** | [Curl runner](/launcher/curl/) · [JSON](/launcher/json/) · [CSV ⇄ JSON](/launcher/csv/) · [Regex](/launcher/regex/) · [Text diff](/launcher/diff/) · [Cron](/launcher/cron/) · [Markdown](/launcher/markdown/) |
+| **Calculators and converters** | [Calculator](/launcher/calculator/) · [Units](/launcher/units/) · [Currency](/launcher/currency/) · [Timestamps](/launcher/timestamp/) · [Number bases and bits](/launcher/bases/) |
+| **Developer tools** | [Curl runner](/launcher/curl/) · [JSON](/launcher/json/) · [JSON, YAML and TOML](/launcher/yaml/) · [CSV ⇄ JSON](/launcher/csv/) · [Regex](/launcher/regex/) · [Text diff](/launcher/diff/) · [Cron](/launcher/cron/) · [Markdown](/launcher/markdown/) · [chmod and umask](/launcher/chmod/) · [Text case and counts](/launcher/text-case/) |
+| **Web and network** | [URL and HTML encoding](/launcher/url/) · [IP and CIDR](/launcher/cidr/) · [HTTP reference](/launcher/http-reference/) · [Open Graph viewer](/launcher/open-graph/) · [Web search](/launcher/web-search/) · [Can I use](/launcher/caniuse/) |
 | **Security and encoding** | [Password generator](/launcher/password/) · [Hashes](/launcher/hash/) · [Base64](/launcher/base64/) · [UUIDs](/launcher/uuid/) · [JWT decoder](/launcher/jwt/) |
 | **Media and design** | [QR codes](/launcher/qr/) · [Colour picker](/launcher/colour/) · [Lorem ipsum](/launcher/lorem/) |
 
@@ -30,4 +31,4 @@ Every tool here (apart from search and commands) can live on your dashboard as a
 
 ## Privacy
 
-The tools run in your browser. Only a few features contact an outside service (currency rates, and the server-side [curl runner](/launcher/curl/)); each page says so. See [Privacy and security](/guides/privacy-and-security/).
+The tools run in your browser. Only a few features contact an outside service (currency rates, the Can I use data, and the server-side [curl runner](/launcher/curl/) and [Open Graph viewer](/launcher/open-graph/)), and web search opens the engine you pick; each page says so. See [Privacy and security](/guides/privacy-and-security/).

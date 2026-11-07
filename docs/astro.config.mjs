@@ -39,11 +39,15 @@ export default defineConfig({
             },
             {
               label: 'Calculators and converters',
-              items: ['launcher/calculator', 'launcher/units', 'launcher/currency', 'launcher/timestamp'],
+              items: ['launcher/calculator', 'launcher/units', 'launcher/currency', 'launcher/timestamp', 'launcher/bases'],
             },
             {
               label: 'Developer tools',
-              items: ['launcher/curl', 'launcher/json', 'launcher/csv', 'launcher/regex', 'launcher/diff', 'launcher/cron', 'launcher/markdown'],
+              items: ['launcher/curl', 'launcher/json', 'launcher/yaml', 'launcher/csv', 'launcher/regex', 'launcher/diff', 'launcher/cron', 'launcher/markdown', 'launcher/chmod', 'launcher/text-case'],
+            },
+            {
+              label: 'Web and network',
+              items: ['launcher/url', 'launcher/cidr', 'launcher/http-reference', 'launcher/open-graph', 'launcher/web-search', 'launcher/caniuse'],
             },
             {
               label: 'Security and encoding',

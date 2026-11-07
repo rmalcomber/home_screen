@@ -137,7 +137,9 @@ Look at `extensions/countdown/` for a small custom widget, and `extensions/color
 
 ## The host API
 
-Extensions reach the app only through `web/src/core/extensions/host.js`, plus Preact and a few listed packages (`marked`, `qrcode-generator`). It offers `patchConfig` and `settings` (tile state), `remember` and `historyItems` (launcher history), `useHotkeyScope` (keyboard shortcuts that stay inside a widget), `IconView`, a `Field` for settings forms, and the shared helpers from `core/lib` (`shortHash`, `relativeTime`, JSON and colour helpers).
+Extensions reach the app only through `web/src/core/extensions/host.js`, plus Preact and a few listed packages (`marked`, `qrcode-generator`). It offers `patchConfig` and `settings` (tile state), `remember` and `historyItems` (launcher history), `useHotkeyScope` (keyboard shortcuts that stay inside a widget), `IconView`, a `Field` for settings forms, `copyText` and a `CopyButton`, row builders for launcher results (`copyItem` for a row that copies, `openItem` for a row that opens a page, `preview` to shorten text for a title), and the shared helpers from `core/lib` (`shortHash`, `relativeTime`, JSON and colour helpers).
+
+A result row may also set `verb` (for example `Open`) so that a widget labels it correctly, and a row of kind `Info` or `Error` is shown without a Copy label.
 
 Two rules, both enforced by the tests:
 

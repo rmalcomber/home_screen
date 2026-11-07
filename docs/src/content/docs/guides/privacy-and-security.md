@@ -19,12 +19,16 @@ Only your browser contacts these, only when the feature is used:
 | `www.google.com/s2/favicons` | Link favicons (this tells Google the domains of your bookmarks) |
 | `api.open-meteo.com`, `geocoding-api.open-meteo.com` | Weather widget |
 | `api.frankfurter.dev` | Currency rates |
+| `raw.githubusercontent.com` | The [Can I use](/launcher/caniuse/) data, downloaded once and kept in your browser |
+| The site you ask about | The preview picture of the [Open Graph viewer](/launcher/open-graph/), after you press Fetch |
 
-Everything else (JSON, JWT, hashes, regex, Markdown, QR codes, passwords, diffs and so on) is computed in your browser. Nothing you paste into a tool is sent to a server.
+Everything else (JSON, YAML, JWT, hashes, regex, Markdown, QR codes, passwords, diffs, subnets and so on) is computed in your browser. Nothing you paste into a tool is sent to a server, apart from the address you give the curl runner or the Open Graph viewer.
 
-## The curl runner
+The [web search](/launcher/web-search/) shortcuts only build an address: the search engine you choose sees your search when the new tab opens, and nothing is sent before you press <kbd>Enter</kbd>.
 
-The [curl runner](/launcher/curl/) makes the HTTP request from the **server**, because browsers cannot call arbitrary sites. It runs from your machine with your network access. The endpoint only accepts requests from this page opened via `localhost`, `127.0.0.1` or a host name you listed in `--allowed-hosts` (see [Options](/getting-started/options/#reaching-it-through-a-proxy-or-another-name)): other websites, including DNS-rebinding tricks, get a `403`. Anyone who can use the page can use the runner, so on a shared server keep authentication in front of it: the server can reach whatever your network can. Redirects are followed only with `-L`, and certificates are checked unless the command contains `-k`.
+## The curl runner and the Open Graph viewer
+
+The [Open Graph viewer](/launcher/open-graph/) fetches the page you name through the same endpoint as the [curl runner](/launcher/curl/), with the same limits and protection, but only when you press Fetch. The [curl runner](/launcher/curl/) makes the HTTP request from the **server**, because browsers cannot call arbitrary sites. It runs from your machine with your network access. The endpoint only accepts requests from this page opened via `localhost`, `127.0.0.1` or a host name you listed in `--allowed-hosts` (see [Options](/getting-started/options/#reaching-it-through-a-proxy-or-another-name)): other websites, including DNS-rebinding tricks, get a `403`. Anyone who can use the page can use the runner, so on a shared server keep authentication in front of it: the server can reach whatever your network can. Redirects are followed only with `-L`, and certificates are checked unless the command contains `-k`.
 
 ## What is saved
 
