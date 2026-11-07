@@ -1,6 +1,6 @@
 [package]
 name = "home_screen"
-version = "0.2.1-beta"
+version = "0.2.2-beta"
 edition = "2021"
 
 [dependencies]
