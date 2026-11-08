@@ -16,6 +16,7 @@ Start with `>` (or press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>, which op
 | Layout: free grid, 2, 3, 4 or 6 columns | Switches the current page's [layout mode](/guides/layout/#layout-modes) |
 | Go to page: *name* | Switches to that page (one command per page) |
 | Import Bookmarks | Opens the Chrome bookmarks import |
+| Clean up links | Opens [Clean up](/guides/clean-up/): duplicates, dead and moved links, tidy-ups |
 | Open Settings | Opens settings |
 | Collapse all tiles | Collapses every tile to its header |
 | Expand all tiles | Expands every tile |

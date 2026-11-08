@@ -2,7 +2,7 @@
 // They register themselves from their manifest, see core/extensions/launcher.js.
 import { registerProvider } from './registry.js'
 import { registerExtensionTools } from '../extensions/launcher.js'
-import { tiles, pages, editing, importing, settingsOpen, settings, saveSettings, focusTile, setAllCollapsed, setPage, arrangePage, setPageMode, templatesOpen } from '../store.js'
+import { tiles, pages, editing, importing, cleaning, settingsOpen, settings, saveSettings, focusTile, setAllCollapsed, setPage, arrangePage, setPageMode, templatesOpen } from '../store.js'
 import { ARRANGE, COLUMN_CHOICES } from '../layout.js'
 import { defaultSize } from '../tiles/sizes.js'
 import { devServices, ENVS, faviconUrl, parseGithub, githubLinks } from '../util.js'
@@ -73,6 +73,7 @@ registerProvider({
       ...COLUMN_CHOICES.map((n) => cmd(`mode-${n}`, `Layout: ${n} columns`, () => setPageMode('columns', n))),
       ...pages.value.map((pg) => cmd(`page:${pg.id}`, `Go to page: ${pg.name}`, () => setPage(pg.id))),
       cmd('import', 'Import Bookmarks', () => (importing.value = true)),
+      cmd('cleanup', 'Clean up links: duplicates, dead links, tidy-ups', () => (cleaning.value = true)),
       cmd('settings', 'Open Settings', () => (settingsOpen.value = true)),
       cmd('collapse', 'Collapse all tiles', () => setAllCollapsed(true)),
       cmd('expand', 'Expand all tiles', () => setAllCollapsed(false)),

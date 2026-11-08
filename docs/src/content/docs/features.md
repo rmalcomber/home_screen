@@ -17,6 +17,7 @@ description: A tour of what Home Screen can do, from tiles and widgets to the la
 - **Icons**: thousands of icons by name (Font Awesome brands, Simple Icons, Material and more) or your own SVG. [Icons](/guides/icons/)
 - **Search**: filter tiles, link titles and partial URLs live. [Search](/guides/search/)
 - **Import**: bring in a Chrome bookmarks export and sort links into tiles by domain. [Import bookmarks](/guides/import-bookmarks/)
+- **Clean up**: find duplicate links across every page, check for dead and moved links, and tidy addresses, with undo. [Clean up links](/guides/clean-up/)
 - **Look and feel**: background colour or image, adjustable glass effect, auto-hiding title bar. [Settings](/guides/settings/)
 
 ## The launcher

@@ -16,9 +16,10 @@ The goal was a Windows executable small enough for a 1.44 MB floppy disk (1,474,
 | Our own HTTP server | 1,089,536 | 365,568 |
 | Fewer daisyUI styles, a few more SQLite options | 1,063,936 | 25,600 |
 | Web app split into lazy-loaded extensions | 1,083,392 | -19,456 (larger) |
-| Ten more launcher tools, as extensions | **1,129,472** | -46,080 (larger) |
+| Ten more launcher tools, as extensions | 1,129,472 | -46,080 (larger) |
+| Ping, traceroute and DNS (native), Clean up, file upload, multi-countdown | **1,196,032** | -66,560 (larger) |
 
-That is **52% smaller**, and about 345,000 bytes under the floppy limit. The numbers are for the 64-bit Windows build made by `build.ps1`. The last two steps make the program larger on purpose: splitting the web app into separate scripts (see below) makes the first page load much lighter, and the ten new tools are new code.
+That is **49% smaller**, and about 278,000 bytes under the floppy limit. The numbers are for the 64-bit Windows build made by `build.ps1`. The last two steps make the program larger on purpose: splitting the web app into separate scripts (see below) makes the first page load much lighter, and the new tools are new code. The network tools talk to the operating system directly (the Windows IP Helper API, or ICMP sockets on Linux and macOS) rather than running `ping` and `tracert`, which costs a few kilobytes and makes the answers the same everywhere.
 
 ## What is in it now
 

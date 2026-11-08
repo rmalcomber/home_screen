@@ -8,7 +8,7 @@ It ships as **one Windows `.exe`** (about 2 MB): a small Rust server with the we
 
 - [Quick start](#quick-start)
 - [Using the dashboard](#using-the-dashboard)
-  - [Tiles](#tiles) · [Layout](#layout) · [Icons](#icons) · [Search](#search) · [Importing Chrome bookmarks](#importing-chrome-bookmarks) · [Settings](#settings)
+  - [Tiles](#tiles) · [Layout](#layout) · [Icons](#icons) · [Search](#search) · [Importing Chrome bookmarks](#importing-chrome-bookmarks) · [Clean up links](#clean-up-links) · [Settings](#settings)
 - [The launcher](#the-launcher)
 - [Keyboard shortcuts](#keyboard-shortcuts)
 - [Where your data lives](#where-your-data-lives)
@@ -59,7 +59,7 @@ The image is Alpine-based (no SSH server), runs as an unprivileged user and supp
 
 ## Using the dashboard
 
-The top bar holds the title, a **tile search box** and the **☰ menu** (Launcher, Add tile, Import Bookmarks, Settings). By default the bar auto-hides: move the mouse to the top edge of the page to reveal it (see [Settings](#settings)).
+The top bar holds the title, a **tile search box** and the **☰ menu** (Launcher, Add tile, Import Bookmarks, Clean up links, Settings). By default the bar auto-hides: move the mouse to the top edge of the page to reveal it (see [Settings](#settings)).
 
 ### Tiles
 
@@ -136,6 +136,10 @@ Link favicons in Bookmarks tiles are fetched from Google's favicon service.
 2. In the dialog, choose that file. Links are **grouped by domain with subdomains merged** (`docs.github.com` and `github.com` land together; multi-part suffixes like `bbc.co.uk` are handled).
 3. Decide where each group goes: use the dropdown on a row, or tick several rows and use **Move selected to** (a new tile with a name you choose, a tile per domain, or an existing Bookmarks tile). Everything starts as *Skip*, so you only import what you pick.
 4. Click **Import**. Duplicate URLs are skipped, and groups sent to the same new tile name are merged into one tile.
+
+### Clean up links
+
+**☰ → Clean up links…** (also **Settings → Links**, and `>cleanup` in the launcher) looks through every tile on every page. **Duplicates** are links that differ only in `http`/`https`, `www`, a trailing slash or tracking parameters. **Check links** asks each site through your server (never automatically) and sorts the answers into moved, not working and blocked. **Organise** strips tracking parameters, fills in missing titles and can group many links to one site into a tile. Nothing changes until you tick rows and press **Apply**, and **Undo last clean up** puts it all back. Dead links are never ticked for removal by default.
 
 ### Settings
 

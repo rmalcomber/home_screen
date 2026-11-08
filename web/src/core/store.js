@@ -17,6 +17,7 @@ export const pageId = signal(null)
 export const query = signal('')
 export const editing = signal(null) // null | tile object | {id:null,...} for new
 export const importing = signal(false)
+export const cleaning = signal(false)
 export const loaded = signal(false)
 export const error = signal('')
 export const settings = signal({})
