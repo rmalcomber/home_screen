@@ -86,6 +86,10 @@ docker build -t home-screen .
 
 The Dockerfile builds the web interface and the program inside the build, so nothing else needs to be installed. A first build takes a few minutes.
 
+## Ping and traceroute in a container
+
+The [network tools](/launcher/network/) send ICMP without root, which Linux allows for groups listed in the `net.ipv4.ping_group_range` setting. Current Docker versions set it for containers, so ping and traceroute work in the image as it is. If your host has narrowed it, ping falls back to TCP connect time and traceroute explains that it cannot read the replies; you can widen the range for a container with `--sysctl net.ipv4.ping_group_range="0 2147483647"`. DNS lookups need nothing special.
+
 ## Upgrading
 
 ```bash

@@ -47,7 +47,7 @@ export default defineConfig({
             },
             {
               label: 'Web and network',
-              items: ['launcher/url', 'launcher/cidr', 'launcher/http-reference', 'launcher/open-graph', 'launcher/web-search', 'launcher/caniuse'],
+              items: ['launcher/url', 'launcher/cidr', 'launcher/http-reference', 'launcher/open-graph', 'launcher/web-search', 'launcher/caniuse', 'launcher/network'],
             },
             {
               label: 'Security and encoding',

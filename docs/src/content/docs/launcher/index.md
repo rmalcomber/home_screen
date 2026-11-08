@@ -21,7 +21,7 @@ Press <kbd>Ctrl</kbd>+<kbd>P</kbd> (or <kbd>Ctrl</kbd>+<kbd>K</kbd>, or **☰ �
 | **Search and commands** | [Search everything](/launcher/search/) · [Commands](/launcher/commands/) |
 | **Calculators and converters** | [Calculator](/launcher/calculator/) · [Units](/launcher/units/) · [Currency](/launcher/currency/) · [Timestamps](/launcher/timestamp/) · [Number bases and bits](/launcher/bases/) |
 | **Developer tools** | [Curl runner](/launcher/curl/) · [JSON](/launcher/json/) · [JSON, YAML and TOML](/launcher/yaml/) · [CSV ⇄ JSON](/launcher/csv/) · [Regex](/launcher/regex/) · [Text diff](/launcher/diff/) · [Cron](/launcher/cron/) · [Markdown](/launcher/markdown/) · [chmod and umask](/launcher/chmod/) · [Text case and counts](/launcher/text-case/) |
-| **Web and network** | [URL and HTML encoding](/launcher/url/) · [IP and CIDR](/launcher/cidr/) · [HTTP reference](/launcher/http-reference/) · [Open Graph viewer](/launcher/open-graph/) · [Web search](/launcher/web-search/) · [Can I use](/launcher/caniuse/) |
+| **Web and network** | [URL and HTML encoding](/launcher/url/) · [IP and CIDR](/launcher/cidr/) · [HTTP reference](/launcher/http-reference/) · [Open Graph viewer](/launcher/open-graph/) · [Web search](/launcher/web-search/) · [Can I use](/launcher/caniuse/) · [Ping, traceroute and DNS](/launcher/network/) |
 | **Security and encoding** | [Password generator](/launcher/password/) · [Hashes](/launcher/hash/) · [Base64](/launcher/base64/) · [UUIDs](/launcher/uuid/) · [JWT decoder](/launcher/jwt/) |
 | **Media and design** | [QR codes](/launcher/qr/) · [Colour picker](/launcher/colour/) · [Lorem ipsum](/launcher/lorem/) |
 
