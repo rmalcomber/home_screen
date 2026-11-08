@@ -11,7 +11,7 @@ export const site = {
   base: process.env.DOCS_BASE ?? '/home_screen',
   repoUrl,
   releasesUrl: `${repoUrl}/releases`,
-  version: '0.2.2-beta',
+  version: '0.3.0-beta',
   beta: 'Beta: Home Screen is under active development. Expect rough edges and changing features.',
 }
 
