@@ -19,7 +19,7 @@ Every [launcher](/launcher/) tool is also a widget. A tool widget hosts the same
 | Time | [Timestamp converter](/launcher/timestamp/) · [Cron explainer](/launcher/cron/) |
 | Security and encoding | [Password generator](/launcher/password/) · [Hash generator](/launcher/hash/) · [Base64](/launcher/base64/) · [UUID generator](/launcher/uuid/) · [JWT decoder](/launcher/jwt/) |
 | Developer tools | [Curl runner](/launcher/curl/) · [JSON formatter](/launcher/json/) · [Regex tester](/launcher/regex/) · [Text diff](/launcher/diff/) · [CSV ⇄ JSON](/launcher/csv/) · [JSON ⇄ YAML and JSON ⇄ TOML](/launcher/yaml/) · [chmod and umask calculators](/launcher/chmod/) · [Text case converter](/launcher/text-case/) |
-| Web and network | [URL encoder and parser, HTML entities](/launcher/url/) · [IP and CIDR calculator](/launcher/cidr/) · [HTTP status codes, headers and MIME types](/launcher/http-reference/) · [Open Graph viewer](/launcher/open-graph/) · [Web search](/launcher/web-search/) · [Can I use](/launcher/caniuse/) |
+| Web and network | [URL encoder and parser, HTML entities](/launcher/url/) · [IP and CIDR calculator](/launcher/cidr/) · [HTTP status codes, headers and MIME types](/launcher/http-reference/) · [Open Graph viewer](/launcher/open-graph/) · [Web search](/launcher/web-search/) · [Can I use](/launcher/caniuse/) · [Ping, Traceroute and DNS records](/launcher/network/) |
 | Media and design | [QR code generator](/launcher/qr/) · [Lorem ipsum](/launcher/lorem/) |
 | Notes | [Markdown previewer](/launcher/markdown/) · [Word and line counter](/launcher/text-case/) |
 
