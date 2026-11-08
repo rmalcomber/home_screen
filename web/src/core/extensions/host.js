@@ -17,7 +17,7 @@ export * from '../lib/json.js'
 export * from '../lib/color.js'
 
 // UI helpers
-export { Field, copyText, CopyButton } from './ui.jsx'
+export { Field, copyText, CopyButton, ListRows } from './ui.jsx'
 
 // Launcher result helpers
 export { copyItem, openItem, preview } from './items.js'
