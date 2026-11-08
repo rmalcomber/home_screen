@@ -32,7 +32,7 @@ The [Open Graph viewer](/launcher/open-graph/) fetches the page you name through
 
 ## What is saved
 
-- JWTs, base64, hashes, JSON and Markdown are processed in your browser and are not sent to the server.
+- JWTs, base64, hashes, JSON and Markdown are processed in your browser and are not sent to the server. The same goes for files you open or drop onto a tool widget: they are read by your browser and not uploaded.
 - Copied curl commands and JWTs appear in Recent, stored in your browser. See [Data and backup](/guides/data-and-backup/).
 - Generated passwords and Wi-Fi QR codes are **never** saved to Recent or anywhere else.
 - Uploaded SVG icons are cleaned and served with a restrictive content-security policy. Image uploads accept raster formats only.

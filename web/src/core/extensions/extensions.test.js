@@ -35,6 +35,17 @@ describe('manifests', () => {
     const w = { kind: 'k', name: 'K', category: 'Nope', icon: 'x', description: 'short', size: [0, 1] }
     expect(validateManifest({ id: 'ok', name: 'Okay', widgets: [w] }).length).toBeGreaterThanOrEqual(4)
   })
+
+  it('checks the host.files flag', () => {
+    const ext = (host) => ({
+      id: 'ok', name: 'Okay', tool: { id: 't', name: 'T', order: 99 },
+      widgets: [{ kind: 'k', name: 'K', category: 'Developer tools', icon: 'iconify:fa6-solid:a', description: 'A fine widget.', size: [3, 3], host: { provider: 't', ...host } }],
+    })
+    expect(validateManifest(ext({ input: 'multi', files: true }))).toEqual([])
+    expect(validateManifest(ext({ input: 'multi', files: 'bytes' }))).toEqual([])
+    expect(validateManifest(ext({ input: 'line', files: true })).join()).toMatch(/files needs/)
+    expect(validateManifest(ext({ input: 'multi', files: 'text' })).join()).toMatch(/true or 'bytes'/)
+  })
 })
 
 describe('widget catalogue', () => {

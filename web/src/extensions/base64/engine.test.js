@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { encode, decode, parseB64Command } from './engine.js'
+import { encode, encodeBytes, decode, parseB64Command } from './engine.js'
 
 describe('base64', () => {
   it('encodes text incl. unicode and url-safe', () => {
@@ -26,5 +26,16 @@ describe('base64', () => {
     expect(parseB64Command('base64   x\ny')).toBe('x\ny')
     expect(parseB64Command('b64')).toBeNull()
     expect(parseB64Command('b64x')).toBeNull()
+  })
+})
+
+describe('encodeBytes', () => {
+  it('encodes raw bytes, standard and URL-safe, and round trips through decode', () => {
+    expect(encodeBytes(new Uint8Array([0, 255, 254, 250]))).toBe('AP/++g==')
+    expect(encodeBytes(new Uint8Array([0, 255, 254, 250]), { url: true })).toBe('AP_--g')
+    expect([...decode(encodeBytes(new Uint8Array([0, 255, 254, 250]))).bytes]).toEqual([0, 255, 254, 250])
+  })
+  it('handles files bigger than the call-stack limit for spread arguments', () => {
+    expect(encodeBytes(new Uint8Array(500_000)).length).toBe(Math.ceil(500_000 / 3) * 4)
   })
 })

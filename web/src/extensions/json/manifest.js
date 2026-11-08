@@ -11,7 +11,7 @@ export default {
       icon: 'iconify:fa6-solid:code',
       description: 'Pretty-print, minify and sort JSON; fixes comments and trailing commas.',
       size: [5, 16],
-      host: { provider: 'json', input: 'multi', placeholder: 'Paste JSON', hint: 'Paste JSON above.' },
+      host: { provider: 'json', input: 'multi', files: true, accept: '.json,.jsonc,.txt,application/json', placeholder: 'Paste JSON', hint: 'Paste JSON above.' },
     },
   ],
 }

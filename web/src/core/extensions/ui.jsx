@@ -68,3 +68,46 @@ export function ListRows({ rows, onChange, render, blank, addLabel = '+ Add', mi
     </div>
   )
 }
+
+/** "Open file…" button. Calls `onFiles(File[])`; the same file can be picked twice in a row. */
+export function FileButton({ onFiles, accept, multiple = false, label = 'Open file…', class: cls = 'btn btn-xs btn-ghost' }) {
+  return (
+    <label class={`${cls} cursor-pointer`}>
+      {label}
+      <input
+        type="file"
+        class="hidden"
+        accept={accept}
+        multiple={multiple}
+        onChange={(e) => {
+          const files = [...(e.target.files || [])]
+          e.target.value = ''
+          if (files.length) onFiles(files)
+        }}
+      />
+    </label>
+  )
+}
+
+/** Wraps children so a file can be dropped on them. Calls `onFiles(File[])`; outlines the area while dragging. */
+export function FileDrop({ onFiles, children, class: cls = '' }) {
+  const [over, setOver] = useState(0)
+  const hasFiles = (e) => [...(e.dataTransfer?.types || [])].includes('Files')
+  return (
+    <div
+      class={`${cls} ${over ? 'outline outline-2 outline-primary rounded' : ''}`}
+      onDragEnter={(e) => { if (hasFiles(e)) { e.preventDefault(); setOver((n) => n + 1) } }}
+      onDragOver={(e) => { if (hasFiles(e)) e.preventDefault() }}
+      onDragLeave={() => setOver((n) => Math.max(0, n - 1))}
+      onDrop={(e) => {
+        if (!hasFiles(e)) return
+        e.preventDefault()
+        setOver(0)
+        const files = [...e.dataTransfer.files]
+        if (files.length) onFiles(files)
+      }}
+    >
+      {children}
+    </div>
+  )
+}

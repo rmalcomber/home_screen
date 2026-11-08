@@ -6,10 +6,13 @@ const toBinary = (bytes) => {
   return s
 }
 
-export const encode = (text, { url = false } = {}) => {
-  const b = btoa(toBinary(new TextEncoder().encode(text)))
+/** Base64 of raw bytes (standard, or URL-safe without padding). */
+export const encodeBytes = (bytes, { url = false } = {}) => {
+  const b = btoa(toBinary(bytes))
   return url ? b.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '') : b
 }
+
+export const encode = (text, opts) => encodeBytes(new TextEncoder().encode(text), opts)
 
 /**
  * Decode standard or URL-safe base64 (padding optional, whitespace ignored).

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { webcrypto } from 'node:crypto'
-import { md5, digest, parseHashCommand } from './engine.js'
+import { md5, digest, digestBytes, parseHashCommand } from './engine.js'
 
 const hex = (b) => [...b].map((x) => x.toString(16).padStart(2, '0')).join('')
 const enc = (s) => new TextEncoder().encode(s)
@@ -40,5 +40,21 @@ describe('parseHashCommand', () => {
     expect(parseHashCommand('sha1\nline1\nline2').ids).toEqual(['sha1'])
     expect(parseHashCommand('hash')).toBeNull()
     expect(parseHashCommand('hashing x')).toBeNull()
+  })
+})
+
+describe('digestBytes', () => {
+  it('hashes raw bytes, the same as the text path for text', async () => {
+    const bytes = enc('abc')
+    const r = await digestBytes(bytes, ['md5', 'sha256'], webcrypto.subtle)
+    expect(r.md5.hex).toBe('900150983cd24fb0d6963f7d28e17f72')
+    expect(r.sha256.hex).toBe('ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad')
+    expect(r).toEqual(await digest('abc', ['md5', 'sha256'], webcrypto.subtle))
+  })
+  it('hashes bytes that are not valid text, and large files', async () => {
+    const r = await digestBytes(new Uint8Array([0, 255, 128]), ['sha1'], webcrypto.subtle)
+    expect(r.sha1.hex).toHaveLength(40)
+    const big = new Uint8Array(3_000_000).fill(7)
+    expect((await digestBytes(big, ['md5'], webcrypto.subtle)).md5.hex).toHaveLength(32)
   })
 })

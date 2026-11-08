@@ -1,8 +1,21 @@
 import { historyItems, remember as rememberHistory } from '../../core/extensions/host.js'
-import { digest, parseHashCommand, ALGOS } from './engine.js'
+import { digest, digestBytes, parseHashCommand, ALGOS } from './engine.js'
 
 // Hash: "hash <text>" gives MD5 + SHA-1/256/384/512; "sha256 <text>" / "md5 <text>" gives one (hex, UPPERCASE hex, base64). Enter copies.
 export default {
+  /** Hashes of a whole file's bytes (the widget's Open file). */
+  async fileItems(bytes, name) {
+    const results = await digestBytes(bytes)
+    return ALGOS.map((algo) => ({
+      key: `hash:file:${algo.id}`,
+      title: results[algo.id].hex,
+      subtitle: `${algo.label} of ${name}  ·  Enter to copy`,
+      kind: 'Copy',
+      recent: false,
+      icon: 'iconify:fa6-solid:hashtag',
+      run: () => navigator.clipboard?.writeText(results[algo.id].hex).catch(() => {}),
+    }))
+  },
   async items(q) {
     if (!q.trim()) return historyItems('hash', 'Hash', 'iconify:fa6-solid:hashtag')
     const cmd = parseHashCommand(q)
