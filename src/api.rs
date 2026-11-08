@@ -4,7 +4,7 @@
 //! answers.
 
 use crate::server::{Request, Response};
-use crate::{db, http_client, Shared};
+use crate::{db, http_client, net, Shared};
 use serde::de::DeserializeOwned;
 use serde::Deserialize;
 use serde_json::{json, Value};
@@ -36,7 +36,9 @@ fn id_of(s: &str) -> Result<i64, u16> {
 fn known_path(segs: &[&str]) -> bool {
     matches!(
         segs,
-        ["api", "tiles" | "layout" | "pages" | "icons" | "images" | "settings" | "run"] | ["api", "tiles" | "pages" | "icons" | "images", _]
+        ["api", "tiles" | "layout" | "pages" | "icons" | "images" | "settings" | "run"]
+            | ["api", "tiles" | "pages" | "icons" | "images", _]
+            | ["api", "net", "ping" | "trace" | "dns"]
     )
 }
 
@@ -63,6 +65,9 @@ pub fn handle(req: &Request, s: &Shared) -> Response {
         ("GET", ["api", "settings"]) => get_settings(s),
         ("PUT", ["api", "settings"]) => put_settings(req, s),
         ("POST", ["api", "run"]) => run(req),
+        ("POST", ["api", "net", "ping"]) => net_ping(req),
+        ("POST", ["api", "net", "trace"]) => net_trace(req),
+        ("POST", ["api", "net", "dns"]) => net_dns(req),
         _ => Err(if known_path(&segs) { 405 } else { 404 }),
     };
     result.unwrap_or_else(Response::new)
@@ -292,6 +297,57 @@ fn run(req: &Request) -> R {
     Ok(Response::json(&perform(r)))
 }
 
+// ---- network tools: ping, traceroute and DNS lookups (see net/mod.rs) ----
+
+#[derive(Deserialize)]
+struct PingReq {
+    host: String,
+    #[serde(default)]
+    count: Option<u32>,
+    #[serde(default)]
+    timeout: Option<u64>,
+}
+
+#[derive(Deserialize)]
+struct TraceReq {
+    host: String,
+    #[serde(default)]
+    max_hops: Option<u32>,
+    #[serde(default)]
+    timeout: Option<u64>,
+}
+
+#[derive(Deserialize)]
+struct DnsReq {
+    name: String,
+    #[serde(default, rename = "type")]
+    rtype: Option<String>,
+    #[serde(default)]
+    resolver: Option<String>,
+}
+
+/// Same gate as the curl runner: our own page only, JSON only; then one of the few job slots.
+fn net_job<T: DeserializeOwned>(req: &Request, work: impl FnOnce(T) -> Value) -> R {
+    if !local_origin_only(req) {
+        return Err(403);
+    }
+    let r: T = json_body(req)?;
+    let Some(_slot) = net::Slot::take() else { return Ok(Response::json(&net::busy())) };
+    Ok(Response::json(&work(r)))
+}
+
+fn net_ping(req: &Request) -> R {
+    net_job(req, |r: PingReq| net::ping(r.host.trim(), r.count.unwrap_or(4), r.timeout.unwrap_or(2000)))
+}
+
+fn net_trace(req: &Request) -> R {
+    net_job(req, |r: TraceReq| net::trace(r.host.trim(), r.max_hops.unwrap_or(20), r.timeout.unwrap_or(1500)))
+}
+
+fn net_dns(req: &Request) -> R {
+    net_job(req, |r: DnsReq| net::dns_lookup(&r.name, r.rtype.as_deref().unwrap_or("A"), r.resolver.as_deref()))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -413,6 +469,29 @@ mod tests {
         let got = handle(&req("GET", &src, None, b""), &s);
         assert!(got.headers.iter().any(|(k, v)| k == "Content-Type" && v == "image/png"));
         assert_eq!(handle(&req("GET", "/api/images/999", None, b""), &s).status, 404);
+    }
+
+    #[test]
+    fn the_network_tools_are_gated_like_the_runner_and_validate_hosts() {
+        let s = state();
+        for path in ["/api/net/ping", "/api/net/trace", "/api/net/dns"] {
+            let body = r#"{"host":"127.0.0.1","name":"example.com"}"#;
+            let mut r = json_req("POST", path, body);
+            r.headers[0].1 = "evil.example".into();
+            assert_eq!(handle(&r, &s).status, 403, "{path}");
+            let mut r = json_req("POST", path, body);
+            r.headers.push(("Origin".into(), "https://evil.example".into()));
+            assert_eq!(handle(&r, &s).status, 403, "{path}");
+            assert_eq!(handle(&req("POST", path, Some("text/plain"), body.as_bytes()), &s).status, 415, "{path}");
+            assert_eq!(handle(&req("GET", path, None, b""), &s).status, 405, "{path}");
+        }
+        // Bad input is an error in a normal 200 response, like the runner.
+        for (path, body) in [("/api/net/ping", r#"{"host":"-f"}"#), ("/api/net/trace", r#"{"host":"a;b"}"#), ("/api/net/dns", r#"{"name":"a b"}"#)] {
+            let r = handle(&json_req("POST", path, body), &s);
+            assert_eq!(r.status, 200, "{path}");
+            assert!(body_json(&r)["error"].is_string(), "{path}");
+        }
+        assert_eq!(handle(&json_req("POST", "/api/net/ping", "{}"), &s).status, 422);
     }
 
     #[test]

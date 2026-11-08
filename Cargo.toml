@@ -9,6 +9,14 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 native-tls = "0.2"
 
+# Ping and traceroute: the Windows IP Helper API, or unprivileged ICMP sockets on Linux and macOS. Both crates are
+# already part of the build through rusqlite and native-tls; only the features used here are switched on.
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.61", default-features = false, features = ["Win32_Foundation", "Win32_NetworkManagement_IpHelper"] }
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
+
 # Linux has no OS TLS library to lean on, so OpenSSL is compiled in (vendored). That keeps the Linux and
 # Docker builds self-contained and static (musl). Windows uses schannel and macOS Security.framework.
 [target.'cfg(target_os = "linux")'.dependencies]

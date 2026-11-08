@@ -134,11 +134,13 @@ dependencies = [
 name = "home_screen"
 version = "0.3.0-beta"
 dependencies = [
+ "libc",
  "native-tls",
  "openssl",
  "rusqlite",
  "serde",
  "serde_json",
+ "windows-sys",
 ]
 
 [[package]]
