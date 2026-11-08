@@ -11,7 +11,7 @@ export default {
       icon: 'iconify:fa6-solid:link',
       description: 'Encode or decode URL text, and take a URL or query string apart into a table.',
       size: [5, 14],
-      host: { provider: 'url', prefix: 'url', input: 'multi', placeholder: 'Text, a URL, or a query string', hint: 'Type or paste text, a URL, or a query string above.' },
+      host: { provider: 'url', prefix: 'url', input: 'multi', files: true, accept: '.txt,.html,.htm,.url', placeholder: 'Text, a URL, or a query string', hint: 'Type or paste text, a URL, or a query string above.' },
     },
     {
       kind: 'tool-html',
@@ -20,7 +20,7 @@ export default {
       icon: 'iconify:fa6-solid:code',
       description: 'Escape text for HTML (&lt; &amp; and friends) or decode entities back to text.',
       size: [4, 10],
-      host: { provider: 'url', prefix: 'html', input: 'multi', placeholder: 'Text to escape, or entities to decode', hint: 'Type or paste text or HTML entities above.' },
+      host: { provider: 'url', prefix: 'html', input: 'multi', files: true, accept: '.txt,.html,.htm,.url', placeholder: 'Text to escape, or entities to decode', hint: 'Type or paste text or HTML entities above.' },
     },
   ],
 }

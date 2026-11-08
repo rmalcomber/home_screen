@@ -8,7 +8,7 @@ It ships as **one Windows `.exe`** (about 2 MB): a small Rust server with the we
 
 - [Quick start](#quick-start)
 - [Using the dashboard](#using-the-dashboard)
-  - [Tiles](#tiles) · [Layout](#layout) · [Icons](#icons) · [Search](#search) · [Importing Chrome bookmarks](#importing-chrome-bookmarks) · [Settings](#settings)
+  - [Tiles](#tiles) · [Layout](#layout) · [Icons](#icons) · [Search](#search) · [Importing Chrome bookmarks](#importing-chrome-bookmarks) · [Clean up links](#clean-up-links) · [Settings](#settings)
 - [The launcher](#the-launcher)
 - [Keyboard shortcuts](#keyboard-shortcuts)
 - [Where your data lives](#where-your-data-lives)
@@ -59,11 +59,11 @@ The image is Alpine-based (no SSH server), runs as an unprivileged user and supp
 
 ## Using the dashboard
 
-The top bar holds the title, a **tile search box** and the **☰ menu** (Launcher, Add tile, Import Bookmarks, Settings). By default the bar auto-hides: move the mouse to the top edge of the page to reveal it (see [Settings](#settings)).
+The top bar holds the title, a **tile search box** and the **☰ menu** (Launcher, Add tile, Import Bookmarks, Clean up links, Settings). By default the bar auto-hides: move the mouse to the top edge of the page to reveal it (see [Settings](#settings)).
 
 ### Tiles
 
-Create one from **☰ → + Add tile**. Pick a type, give it a title and an optional icon, then fill in the type-specific form. Point at a tile's title bar and click the ✎ to edit or delete it (it appears on hover; on touch screens it is always shown). You can have as many tiles as you like.
+Create one with **＋ Add tile** above the grid (or **☰ → + Add tile**). Pick a type, give it a title and an optional icon, then fill in the type-specific form. Point at a tile's title bar and click the ✎ to edit or delete it (it appears on hover; on touch screens it is always shown). You can have as many tiles as you like.
 
 | Type | What it is |
 |---|---|
@@ -88,7 +88,7 @@ Create one from **☰ → + Add tile**. Pick a type, give it a title and an opti
 
 **Adding a widget.** In **☰ → + Add tile** choose **Widget**. A picker lists every widget with an icon and a one-line description. Browse by category (*Time & weather*, *Notes & tasks*, *Media & design*, *Calculators & converters*, *Security & encoding*, *Developer tools*) or search across all of them. Picking one fills in the **title and icon** for you (type or choose your own to override) and shows that widget's settings, if it has any, underneath.
 
-**Every launcher tool is also a widget.** These host the same engine as the launcher, with a text box on top and the result below; click a result to copy it. They are: Calculator, Unit converter, Currency converter, Timestamp converter, Cron explainer, Lorem ipsum, Markdown previewer, QR code generator, Password generator, Hash generator, Base64, UUID generator, JWT decoder, Curl runner, JSON formatter, Regex tester, Text diff, CSV ⇄ JSON, URL encoder and parser, HTML entities, JSON ⇄ YAML and JSON ⇄ TOML converters, Number base converter, Byte size converter, Bit calculator, chmod and umask calculators, Text case converter, Word and line counter, IP and CIDR calculator, HTTP status codes, HTTP headers, MIME types, Open Graph viewer, Web search and Can I use (the colour tool is the Colour picker widget above). Generators have a ↻ button to make new values. What you type into a tool widget is **not saved** (it can contain tokens, JSON or commands), so the box is empty after a reload. Keyboard shortcuts in a tool widget only apply while focus is inside that widget, and they use **Ctrl+Enter** rather than plain Enter, which stays free for typing.
+**Every launcher tool is also a widget.** These host the same engine as the launcher, with a text box on top and the result below; click a result to copy it. They are: Calculator, Unit converter, Currency converter, Timestamp converter, Cron explainer, Lorem ipsum, Markdown previewer, QR code generator, Password generator, Hash generator, Base64, UUID generator, JWT decoder, Curl runner, JSON formatter, Regex tester, Text diff, CSV ⇄ JSON, URL encoder and parser, HTML entities, JSON ⇄ YAML and JSON ⇄ TOML converters, Number base converter, Byte size converter, Bit calculator, chmod and umask calculators, Text case converter, Word and line counter, IP and CIDR calculator, HTTP status codes, HTTP headers, MIME types, Open Graph viewer, Web search, Can I use, Ping, Traceroute and DNS records (the colour tool is the Colour picker widget above). Generators have a ↻ button to make new values. What you type into a tool widget is **not saved** (it can contain tokens, JSON or commands), so the box is empty after a reload. Keyboard shortcuts in a tool widget only apply while focus is inside that widget, and they use **Ctrl+Enter** rather than plain Enter, which stays free for typing.
 
 **Several clocks or places.** The Clock and Weather widgets can show many time zones or cities at once, either as a stacked **list** or as **mini tiles** laid out side by side (wrapping onto further rows when the tile is narrow). Choose the layout under *Layout when there is more than one* in the widget's settings; with a single zone or place the widget shows the large single view.
 
@@ -136,6 +136,10 @@ Link favicons in Bookmarks tiles are fetched from Google's favicon service.
 2. In the dialog, choose that file. Links are **grouped by domain with subdomains merged** (`docs.github.com` and `github.com` land together; multi-part suffixes like `bbc.co.uk` are handled).
 3. Decide where each group goes: use the dropdown on a row, or tick several rows and use **Move selected to** (a new tile with a name you choose, a tile per domain, or an existing Bookmarks tile). Everything starts as *Skip*, so you only import what you pick.
 4. Click **Import**. Duplicate URLs are skipped, and groups sent to the same new tile name are merged into one tile.
+
+### Clean up links
+
+**☰ → Clean up links…** (also **Settings → Links**, and `>cleanup` in the launcher) looks through every tile on every page. **Duplicates** are links that differ only in `http`/`https`, `www`, a trailing slash or tracking parameters. **Check links** asks each site through your server (never automatically) and sorts the answers into moved, not working and blocked. **Organise** strips tracking parameters, fills in missing titles and can group many links to one site into a tile. Nothing changes until you tick rows and press **Apply**, and **Undo last clean up** puts it all back. Dead links are never ticked for removal by default.
 
 ### Settings
 
@@ -311,6 +315,7 @@ Each of these is also a widget. Full pages with every option are in the docs und
 | `og <url>` | Open Graph viewer: press Enter to fetch the page through your server and see the preview card, every `og:` and `twitter:` tag and what is missing |
 | `google <text>`, `ddg`, `github`, `youtube`, `mdn`, `search <text>` and about twenty more | Opens that search in a new tab; `search` lists every engine |
 | `caniuse grid`, `ciu flexbox gap` | Browser support from the public Can I use data, downloaded once and kept in your browser |
+| `ping host`, `trace host`, `dns example.com MX @1.1.1.1`, `ptr 8.8.8.8` | Ping, traceroute and DNS record lookups, run by your Home Screen server (built in, no helper programs; press Enter to run) |
 
 ---
 

@@ -42,6 +42,10 @@ export function validateManifest(m) {
       need(m.tool, `${at}: host widgets need the extension to have a tool`)
       need(w.host.provider === m.tool?.id, `${at}: host.provider must be the extension's tool id`)
       need(INPUTS.includes(w.host.input), `${at}: host.input must be one of ${INPUTS.join(', ')}`)
+      if (w.host.files !== undefined) {
+        need(w.host.files === true || w.host.files === 'bytes', `${at}: host.files must be true or 'bytes'`)
+        need(w.host.input === 'multi', `${at}: host.files needs host.input 'multi'`)
+      }
     }
   }
   return bad

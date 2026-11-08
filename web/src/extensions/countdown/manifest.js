@@ -8,9 +8,9 @@ export default {
       name: 'Countdown',
       category: 'Time & weather',
       icon: 'iconify:fa6-solid:hourglass-half',
-      description: 'Days until (or since) a date.',
+      description: 'Days until (or since) one or more dates, in one tile.',
       size: [3, 6],
-      defaults: { kind: 'countdown', label: '', date: '' },
+      defaults: { kind: 'countdown', countdowns: [{ label: '', date: '' }], layout: 'list' },
     },
   ],
 }

@@ -11,7 +11,6 @@ This is a thinking-out-loud list. Items may change, move or never happen. What e
 
 The everyday developer utilities are now built in: URL and HTML encoding, JSON, YAML and TOML conversion, number bases and bit tools, IP and CIDR maths, `chmod`, text case and counts, an HTTP reference, an Open Graph viewer, web search shortcuts and Can I use. See [The launcher](/launcher/). What is next:
 
-- **Bookmark link checker**: find dead or redirected links in your tiles. Planned for the next release.
 - **Your own search engines**: add a keyword and a URL with `%s` in Settings, next to the built-in [web search](/launcher/web-search/) list.
 - **Can I use offline from the first run**: today the data is downloaded the first time and kept in the browser. A bundled copy would work from the start but would make the program several hundred kilobytes larger.
 

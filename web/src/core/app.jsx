@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'preact/hooks'
-import { pageTiles, query, editing, importing, loaded, error, settings, settingsOpen, launcher, templatesOpen, load } from './store.js'
+import { pageTiles, query, editing, importing, cleaning, loaded, error, settings, settingsOpen, launcher, templatesOpen, load } from './store.js'
 import { Launcher } from './launcher/Launcher.jsx'
 import { SettingsDialog } from './ui/SettingsDialog.jsx'
 import { Grid } from './ui/Grid.jsx'
@@ -7,6 +7,7 @@ import { TileEditor } from './ui/TileEditor.jsx'
 import { PageBar } from './ui/PageBar.jsx'
 import { TemplatePicker, TemplateCards } from './ui/TemplatePicker.jsx'
 import { ImportBookmarks } from './ui/ImportBookmarks.jsx'
+import { CleanUp } from './ui/CleanUpLoader.jsx'
 
 export function App() {
   const search = useRef()
@@ -75,6 +76,7 @@ export function App() {
             <li><button onClick={act(() => (editing.value = { id: null, type: 'group' }))}>＋ Add group</button></li>
             <li><button onClick={act(() => (templatesOpen.value = true))}>Starter templates</button></li>
             <li><button onClick={act(() => (importing.value = true))}>Import Bookmarks</button></li>
+            <li><button onClick={act(() => (cleaning.value = true))}>Clean up links…</button></li>
             <div class="divider my-0"></div>
             <li><button onClick={act(() => (settingsOpen.value = true))}>Settings</button></li>
           </ul>
@@ -110,6 +112,7 @@ export function App() {
       <TileEditor />
       <TemplatePicker />
       <ImportBookmarks />
+      <CleanUp />
       <SettingsDialog />
       <Launcher />
     </>

@@ -22,6 +22,9 @@ Everything the dashboard does goes through a small JSON API on the same port. Th
 | `GET /api/images/{id}`, `DELETE /api/images/{id}` | Serve and delete an image |
 | `GET /api/settings`, `PUT /api/settings` | Read and merge settings (`bgColor`, `bgImage`, `glass`, `autoHideBar`) |
 | `POST /api/run` | Run an HTTP request for the [curl runner](/launcher/curl/) (localhost origin only) |
+| `POST /api/net/ping` | Ping a host (`{ host, count?, timeout? }`): replies, times, loss. See [network tools](/launcher/network/); localhost origin only |
+| `POST /api/net/trace` | Trace the route to a host (`{ host, max_hops?, timeout? }`) |
+| `POST /api/net/dns` | Look up DNS records (`{ name, type?, resolver? }`) |
 
 A tile looks like this:
 

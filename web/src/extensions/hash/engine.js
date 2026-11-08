@@ -10,7 +10,11 @@ export const ALGOS = [
 ]
 
 const hex = (bytes) => [...bytes].map((b) => b.toString(16).padStart(2, '0')).join('')
-const b64 = (bytes) => btoa(String.fromCharCode(...bytes))
+const b64 = (bytes) => {
+  let s = ''
+  for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode(...bytes.subarray(i, i + 0x8000))
+  return btoa(s)
+}
 
 const S = [7, 12, 17, 22, 5, 9, 14, 20, 4, 11, 16, 23, 6, 10, 15, 21]
 const K = Array.from({ length: 64 }, (_, i) => Math.floor(Math.abs(Math.sin(i + 1)) * 2 ** 32) >>> 0)
@@ -47,9 +51,8 @@ export function md5(bytes) {
   return out
 }
 
-/** Digest `text` (UTF-8) with each requested algorithm → { id: { hex, b64 } }. */
-export async function digest(text, ids = ALGOS.map((a) => a.id), subtle = globalThis.crypto?.subtle) {
-  const data = new TextEncoder().encode(text)
+/** Digest bytes with each requested algorithm → { id: { hex, b64 } }. */
+export async function digestBytes(data, ids = ALGOS.map((a) => a.id), subtle = globalThis.crypto?.subtle) {
   const out = {}
   for (const id of ids) {
     const algo = ALGOS.find((a) => a.id === id)
@@ -58,6 +61,9 @@ export async function digest(text, ids = ALGOS.map((a) => a.id), subtle = global
   }
   return out
 }
+
+/** Digest `text` (UTF-8) with each requested algorithm → { id: { hex, b64 } }. */
+export const digest = (text, ids, subtle) => digestBytes(new TextEncoder().encode(text), ids, subtle)
 
 /** "hash text" (all algorithms) or "sha256 text" / "md5 text" (one). Returns { text, ids } or null. */
 export function parseHashCommand(q) {

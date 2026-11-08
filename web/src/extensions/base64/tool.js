@@ -1,8 +1,21 @@
-import { encode, decode, parseB64Command } from './engine.js'
+import { encode, encodeBytes, decode, parseB64Command } from './engine.js'
 import { historyItems, remember as rememberHistory } from '../../core/extensions/host.js'
 
 // Base64: "b64 <text>" encodes (standard + URL-safe) and, when the text is valid base64, decodes. Enter copies the result.
 export default {
+  /** Base64 of a whole file's bytes (the widget's Open file). */
+  fileItems(bytes, name) {
+    const mk = (label, value) => ({
+      key: `b64:file:${label}`,
+      title: value.length > 120 ? value.slice(0, 120) + '…' : value,
+      subtitle: `${label} of ${name} (${value.length.toLocaleString('en-GB')} characters)  ·  Enter to copy`,
+      kind: 'Copy',
+      recent: false,
+      icon: 'iconify:fa6-solid:key',
+      run: () => navigator.clipboard?.writeText(value).catch(() => {}),
+    })
+    return [mk('Base64', encodeBytes(bytes)), mk('URL-safe base64 (no padding)', encodeBytes(bytes, { url: true }))]
+  },
   items(q) {
     if (!q.trim()) return historyItems('b64', 'Base64', 'iconify:fa6-solid:key')
     const text = parseB64Command(q)

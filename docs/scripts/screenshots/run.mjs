@@ -171,6 +171,20 @@ await sleep(500)
 await snap('import-bookmarks', { screenshot: async ({ path }) => page.screenshot({ path, clip: await box(10) }) })
 await closeDialog()
 
+// Clean up: a throwaway tile with a duplicate, a tracking link and a link without a title. Nothing is checked over the network.
+const messy = await api('POST', '/api/tiles', { type: 'bookmarks', title: 'Reading list', x: 0, y: 0, w: 4, h: 8, collapsed: false, config: { links: [
+  { title: 'Rust book', url: 'https://doc.rust-lang.org/book/' },
+  { title: 'The Rust Book', url: 'http://doc.rust-lang.org/book' },
+  { title: 'Preact', url: 'https://preactjs.com/guide/v10/getting-started?utm_source=newsletter&utm_medium=email' },
+  { title: '', url: 'https://www.sqlite.org/' },
+] } })
+await goHome()
+await menu('Clean up links…')
+await sleep(600)
+await snap('clean-up', { screenshot: async ({ path }) => page.screenshot({ path, clip: await box(10) }) })
+await closeDialog()
+await api('DELETE', `/api/tiles/${messy.id}`)
+
 console.log('Launcher')
 await goHome()
 await openLauncher('', 600)

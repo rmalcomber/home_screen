@@ -11,7 +11,7 @@ export default {
       icon: 'iconify:fa6-solid:file-code',
       description: 'Paste JSON or TOML to get YAML, or YAML to get JSON. Reads config-style YAML.',
       size: [6, 20],
-      host: { provider: 'yaml', prefix: 'yaml', input: 'multi', rows: 6, placeholder: 'Paste JSON, YAML or TOML', hint: 'Paste JSON, YAML or TOML above.' },
+      host: { provider: 'yaml', prefix: 'yaml', input: 'multi', files: true, accept: '.yaml,.yml,.toml,.json,.txt', rows: 6, placeholder: 'Paste JSON, YAML or TOML', hint: 'Paste JSON, YAML or TOML above.' },
     },
     {
       kind: 'tool-toml',
@@ -20,7 +20,7 @@ export default {
       icon: 'iconify:fa6-solid:gears',
       description: 'Paste JSON or YAML to get TOML, or TOML to get JSON.',
       size: [6, 20],
-      host: { provider: 'yaml', prefix: 'toml', input: 'multi', rows: 6, placeholder: 'Paste JSON, YAML or TOML', hint: 'Paste JSON, YAML or TOML above.' },
+      host: { provider: 'yaml', prefix: 'toml', input: 'multi', files: true, accept: '.yaml,.yml,.toml,.json,.txt', rows: 6, placeholder: 'Paste JSON, YAML or TOML', hint: 'Paste JSON, YAML or TOML above.' },
     },
   ],
 }

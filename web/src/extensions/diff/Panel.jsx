@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'preact/hooks'
-import { useHotkeyScope, remember, shortHash } from '../../core/extensions/host.js'
+import { useHotkeyScope, remember, shortHash, FileButton, FileDrop, readTextFile } from '../../core/extensions/host.js'
 import { computeDiff, toUnifiedDiff, diffFill } from './engine.js'
 
 const CONTEXT = 3
@@ -112,6 +112,20 @@ export function DiffPanel({ item }) {
     try { set(await navigator.clipboard.readText()); setNote('') } catch { setNote('The browser blocked clipboard access. Paste with Ctrl+V into the box instead.') }
   }
 
+  // Open or drop one file into a box, or two files at once (the first is the original, the second the changed text).
+  const openFiles = async (files, sides) => {
+    const setters = sides.length === 1 && files.length === 1 ? sides : [setA, setB]
+    const skipped = files.length > setters.length
+    const out = []
+    for (const f of files.slice(0, setters.length)) {
+      const r = await readTextFile(f)
+      if (!r.ok) { setNote(r.error); return }
+      out.push(r.text)
+    }
+    out.forEach((t, i) => setters[i](t))
+    setNote(skipped ? 'Only the first two files were used.' : '')
+  }
+
   const expand = (start, n) => setExpanded((s) => { const x = new Set(s); for (let i = start; i < start + n; i++) x.add(i); return x })
   const rows = result?.rows || []
   const tooMany = rows.length > MAX_ROWS
@@ -121,7 +135,8 @@ export function DiffPanel({ item }) {
     <div class="grid gap-1 min-w-0">
       <div class="flex items-center gap-1">
         <span class="text-xs font-semibold uppercase tracking-wide opacity-70">{label}</span>
-        <button class="btn btn-xs btn-ghost ml-auto" onClick={() => paste(set)}>Paste</button>
+        <FileButton accept=".txt,.md,.json,.yaml,.yml,.js,.css,.html,.csv,.log,.diff,.patch" onFiles={(f) => openFiles(f, [set])} class="btn btn-xs btn-ghost ml-auto" />
+        <button class="btn btn-xs btn-ghost" onClick={() => paste(set)}>Paste</button>
         <button class="btn btn-xs btn-ghost" onClick={() => set('')}>Clear</button>
       </div>
       <textarea class="textarea textarea-bordered textarea-sm font-mono w-full leading-snug" rows={6} value={value} onInput={(e) => set(e.target.value)} spellcheck={false} wrap="off" placeholder="Paste text…" />
@@ -130,10 +145,10 @@ export function DiffPanel({ item }) {
 
   return (
     <div class="p-3 grid gap-3 max-h-[70vh] overflow-auto">
-      <div class="grid grid-cols-2 gap-2">
+      <FileDrop onFiles={(f) => openFiles(f, [setA, setB])} class="grid grid-cols-2 gap-2">
         {box('Original', a, setA)}
         {box('Changed', b, setB)}
-      </div>
+      </FileDrop>
       {note && <div role="alert" class="alert alert-warning py-1 text-sm">{note}</div>}
 
       <div class="flex flex-wrap items-center gap-3">

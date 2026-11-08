@@ -15,9 +15,10 @@ export { IconView } from '../ui/IconView.jsx'
 export * from '../lib/text.js'
 export * from '../lib/json.js'
 export * from '../lib/color.js'
+export * from '../lib/file.js'
 
 // UI helpers
-export { Field, copyText, CopyButton } from './ui.jsx'
+export { Field, copyText, CopyButton, ListRows, FileButton, FileDrop } from './ui.jsx'
 
 // Launcher result helpers
 export { copyItem, openItem, preview } from './items.js'

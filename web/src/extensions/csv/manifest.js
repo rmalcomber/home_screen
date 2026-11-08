@@ -15,6 +15,8 @@ export default {
         provider: 'csv',
         prefix: 'csv',
         input: 'multi',
+        files: true,
+        accept: '.csv,.tsv,.txt',
         placeholder: 'Paste CSV, TSV or JSON',
         hint: 'Paste CSV, TSV or JSON above.',
       },

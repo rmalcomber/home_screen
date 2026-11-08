@@ -17,6 +17,7 @@ description: A tour of what Home Screen can do, from tiles and widgets to the la
 - **Icons**: thousands of icons by name (Font Awesome brands, Simple Icons, Material and more) or your own SVG. [Icons](/guides/icons/)
 - **Search**: filter tiles, link titles and partial URLs live. [Search](/guides/search/)
 - **Import**: bring in a Chrome bookmarks export and sort links into tiles by domain. [Import bookmarks](/guides/import-bookmarks/)
+- **Clean up**: find duplicate links across every page, check for dead and moved links, and tidy addresses, with undo. [Clean up links](/guides/clean-up/)
 - **Look and feel**: background colour or image, adjustable glass effect, auto-hiding title bar. [Settings](/guides/settings/)
 
 ## The launcher
@@ -32,6 +33,7 @@ Press <kbd>Ctrl</kbd>+<kbd>P</kbd> anywhere on the dashboard. It searches your t
 | `qr https://…`, `password 24`, `uuid`, `hash …` | generators |
 | `yaml …`, `chmod 755`, `cidr 10.0.0.0/24`, `hex ff`, `snake some text` | developer and network helpers |
 | `google …`, `caniuse grid`, `og https://…`, `status 404` | web search, browser support, link previews and HTTP reference |
+| `ping host`, `trace host`, `dns example.com MX` | ping, traceroute and DNS records, run from the machine that runs Home Screen |
 | `>` | commands (add tile or group, arrange, layout, go to page, import, settings) |
 
 [Launcher overview](/launcher/) · [Search](/launcher/search/) · [All tools](/launcher/calculator/)

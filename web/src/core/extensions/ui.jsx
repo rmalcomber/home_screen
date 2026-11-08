@@ -35,3 +35,79 @@ export function CopyButton({ text, label = 'Copy', class: cls = 'btn btn-xs btn-
     </button>
   )
 }
+
+/**
+ * Rows editor for a widget's Options: add, remove and move rows up or down.
+ * `rows` is an array and `onChange(next)` gets the new array. `render(row, set, i)` draws one row's fields
+ * (`set(patch)` merges into that row). `blank` is the new row. At least `min` rows are kept.
+ */
+export function ListRows({ rows, onChange, render, blank, addLabel = '+ Add', min = 1 }) {
+  const patch = (i, p) => onChange(rows.map((r, j) => (j === i ? { ...r, ...p } : r)))
+  const move = (i, d) => {
+    const next = [...rows]
+    const t = next[i]
+    next[i] = next[i + d]
+    next[i + d] = t
+    onChange(next)
+  }
+  return (
+    <div class="grid gap-2">
+      {rows.map((r, i) => (
+        <div key={i} class="flex gap-1 items-start">
+          <div class="grid gap-1 flex-1 min-w-0">{render(r, (p) => patch(i, p), i)}</div>
+          <div class="flex flex-col">
+            <button type="button" class="btn btn-ghost btn-xs px-1 min-h-0 h-5" aria-label="Move up" disabled={i === 0} onClick={() => move(i, -1)}>▲</button>
+            <button type="button" class="btn btn-ghost btn-xs px-1 min-h-0 h-5" aria-label="Move down" disabled={i === rows.length - 1} onClick={() => move(i, 1)}>▼</button>
+          </div>
+          {rows.length > min && (
+            <button type="button" class="btn btn-ghost btn-xs" aria-label="Remove" onClick={() => onChange(rows.filter((_, j) => j !== i))}>✕</button>
+          )}
+        </div>
+      ))}
+      <button type="button" class="btn btn-xs btn-outline justify-self-start" onClick={() => onChange([...rows, typeof blank === 'function' ? blank() : { ...blank }])}>{addLabel}</button>
+    </div>
+  )
+}
+
+/** "Open file…" button. Calls `onFiles(File[])`; the same file can be picked twice in a row. */
+export function FileButton({ onFiles, accept, multiple = false, label = 'Open file…', class: cls = 'btn btn-xs btn-ghost' }) {
+  return (
+    <label class={`${cls} cursor-pointer`}>
+      {label}
+      <input
+        type="file"
+        class="hidden"
+        accept={accept}
+        multiple={multiple}
+        onChange={(e) => {
+          const files = [...(e.target.files || [])]
+          e.target.value = ''
+          if (files.length) onFiles(files)
+        }}
+      />
+    </label>
+  )
+}
+
+/** Wraps children so a file can be dropped on them. Calls `onFiles(File[])`; outlines the area while dragging. */
+export function FileDrop({ onFiles, children, class: cls = '' }) {
+  const [over, setOver] = useState(0)
+  const hasFiles = (e) => [...(e.dataTransfer?.types || [])].includes('Files')
+  return (
+    <div
+      class={`${cls} ${over ? 'outline outline-2 outline-primary rounded' : ''}`}
+      onDragEnter={(e) => { if (hasFiles(e)) { e.preventDefault(); setOver((n) => n + 1) } }}
+      onDragOver={(e) => { if (hasFiles(e)) e.preventDefault() }}
+      onDragLeave={() => setOver((n) => Math.max(0, n - 1))}
+      onDrop={(e) => {
+        if (!hasFiles(e)) return
+        e.preventDefault()
+        setOver(0)
+        const files = [...e.dataTransfer.files]
+        if (files.length) onFiles(files)
+      }}
+    >
+      {children}
+    </div>
+  )
+}

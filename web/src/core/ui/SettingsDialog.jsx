@@ -1,5 +1,5 @@
 import { useState } from 'preact/hooks'
-import { settings, settingsOpen, saveSettings } from '../store.js'
+import { settings, settingsOpen, saveSettings, cleaning } from '../store.js'
 
 const SWATCHES = ['#1c2229', '#0f172a', '#1e1b4b', '#14312b', '#3b1d2a', '#2b2b2b', '#000000', '#e2e8f0']
 
@@ -77,6 +77,14 @@ function Dialog() {
           <div class="flex justify-between"><h4 class="font-semibold text-sm">Glass</h4><span class="text-xs opacity-70">{glass}%</span></div>
           <input type="range" min="0" max="100" step="1" class="range range-primary range-sm" value={glass} onInput={(e) => saveSettings({ glass: +e.target.value })} />
           <p class="text-xs opacity-60">0% is solid tiles; higher makes tiles and the top bar see-through and blurs the background behind them.</p>
+        </section>
+
+        <section class="grid gap-2">
+          <h4 class="font-semibold text-sm">Links</h4>
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" class="btn btn-sm btn-outline" onClick={() => { close(); cleaning.value = true }}>Clean up links…</button>
+            <span class="text-xs opacity-60">Find duplicates, dead and moved links, and tidy addresses.{s.cleanupLastCheck ? ` Last link check: ${new Date(s.cleanupLastCheck).toLocaleDateString()}.` : ''}</span>
+          </div>
         </section>
 
         <div class="modal-action mt-0">

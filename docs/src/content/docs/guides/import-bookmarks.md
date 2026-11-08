@@ -5,7 +5,7 @@ sidebar:
   order: 7
 ---
 
-**☰ → Import Bookmarks** turns a Chrome export into tiles.
+**☰ → Import Bookmarks** turns a Chrome export into tiles. Afterwards, [Clean up links](/guides/clean-up/) finds duplicates and dead links across everything you imported.
 
 1. In Chrome open the Bookmark Manager (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>O</kbd>), then **⋮ → Export bookmarks**. This saves an HTML file.
 2. In the dialog, choose that file. Links are **grouped by domain with subdomains merged**: `docs.github.com` and `github.com` land together, and multi-part suffixes such as `bbc.co.uk` are handled.

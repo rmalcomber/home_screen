@@ -13,7 +13,7 @@ A **group** is a box that holds other tiles. It moves, resizes and collapses lik
 
 ### Make one
 
-- **＋ Group** above the grid, **☰ → ＋ Add group**, or `> Add group` in the [launcher](/launcher/commands/).
+- **＋ Group** above the grid (next to **＋ Add tile**), **☰ → ＋ Add group**, or `> Add group` in the [launcher](/launcher/commands/).
 - Give it a title, pick a colour and, if you like, an icon.
 - Add tiles to it with the **＋** button that appears on the group's title bar, or choose the group in a tile's **Inside group** list when you add or edit the tile.
 
