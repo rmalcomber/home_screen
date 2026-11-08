@@ -16,8 +16,9 @@ Every release page mirrors its GitHub release, which is where the downloads are 
 
 | Version | Status | Highlights |
 |---|---|---|
-| [0.3.0-beta](/releases/v0.3.0-beta/) | Latest beta | Ten new tools: URL, YAML/TOML, bases, CIDR, chmod, text case, HTTP reference, Open Graph, web search, Can I use |
-| [0.2.2-beta](/releases/v0.2.2-beta/) | Previous beta | Widgets and tools load on demand: a 65% lighter first page load |
+| [0.4.0-beta](/releases/v0.4.0-beta/) | Latest beta | Clean up links, ping/traceroute/DNS, file open on tool widgets, multi-countdown |
+| [0.3.0-beta](/releases/v0.3.0-beta/) | Previous beta | Ten new tools: URL, YAML/TOML, bases, CIDR, chmod, text case, HTTP reference, Open Graph, web search, Can I use |
+| [0.2.2-beta](/releases/v0.2.2-beta/) | Beta | Widgets and tools load on demand: a 65% lighter first page load |
 | [0.2.1-beta](/releases/v0.2.1-beta/) | Beta | A 1.0 MB Windows binary: 55% smaller, no behaviour change you will notice in the app |
 | [0.2.0-beta](/releases/v0.2.0-beta/) | Beta | Groups, colours, pages, layout modes, auto-arrange, starter templates |
 | [0.1.0-beta](/releases/v0.1.0-beta/) | First beta | Dashboard, launcher with {{metric.tools}} tools, {{metric.widgets}} widgets, a {{metric.exe_size}} binary |
