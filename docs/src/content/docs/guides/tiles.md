@@ -5,7 +5,7 @@ sidebar:
   order: 1
 ---
 
-Create a tile from **☰ → ＋ Add tile**. Point at a tile's title bar and click the ✎ to edit or delete it (the button appears when you hover; on touch screens it is always shown). There is no limit on how many tiles you have.
+Create a tile with **＋ Add tile** above the grid, or from **☰ → ＋ Add tile**. Point at a tile's title bar and click the ✎ to edit or delete it (the button appears when you hover; on touch screens it is always shown). There is no limit on how many tiles you have.
 
 Every tile can have a [colour](/guides/groups-and-colours/#colours), and can sit on a [page](/guides/pages-and-templates/) and inside a [group](/guides/groups-and-colours/).
 

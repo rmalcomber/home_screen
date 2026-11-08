@@ -47,7 +47,8 @@ export function PageBar() {
       </div>
 
       <div class="ml-auto flex items-center gap-1">
-        <button class="btn btn-sm btn-ghost tile-glass" onClick={() => (editing.value = { id: null, type: 'group', page_id: page.id })}>＋ Group</button>
+        <button class="btn btn-sm btn-primary" title="Add a bookmark, widget, developer or GitHub tile to this page" onClick={() => (editing.value = { id: null, page_id: page.id })}>＋ Add tile</button>
+        <button class="btn btn-sm btn-ghost tile-glass" title="Add a coloured group that holds other tiles" onClick={() => (editing.value = { id: null, type: 'group', page_id: page.id })}>＋ Group</button>
         <div class="dropdown dropdown-end">
           <button tabIndex={0} class="btn btn-sm btn-ghost tile-glass" aria-haspopup="menu">Layout ▾</button>
           <ul tabIndex={0} class="menu menu-sm dropdown-content bg-base-100 rounded-box shadow-lg border border-base-300 w-64 mt-1 z-50 max-h-[80vh] overflow-auto flex-nowrap">

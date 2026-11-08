@@ -9,7 +9,7 @@ A quick tour that takes about five minutes.
 
 ## 1. Add a tile
 
-Open the **☰** menu at the top right and choose **＋ Add tile**. Pick a type:
+Click **＋ Add tile** above the grid (or choose it from the **☰** menu at the top right). Pick a type:
 
 ![The Add tile dialog with the Widget type selected and the widget gallery showing security tools.](../../../assets/screenshots/add-tile-widget-picker.webp)
 

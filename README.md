@@ -63,7 +63,7 @@ The top bar holds the title, a **tile search box** and the **☰ menu** (Launche
 
 ### Tiles
 
-Create one from **☰ → + Add tile**. Pick a type, give it a title and an optional icon, then fill in the type-specific form. Point at a tile's title bar and click the ✎ to edit or delete it (it appears on hover; on touch screens it is always shown). You can have as many tiles as you like.
+Create one with **＋ Add tile** above the grid (or **☰ → + Add tile**). Pick a type, give it a title and an optional icon, then fill in the type-specific form. Point at a tile's title bar and click the ✎ to edit or delete it (it appears on hover; on touch screens it is always shown). You can have as many tiles as you like.
 
 | Type | What it is |
 |---|---|
