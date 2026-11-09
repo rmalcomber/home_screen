@@ -9,11 +9,16 @@ Home Screen is a small Rust server with the web interface compiled into it. This
 
 ## The shape of it
 
-```text
- Browser ──HTTP──▶  home_screen (one program)
-                     ├─ a small HTTP server on 127.0.0.1:7878
-                     ├─ the web interface, embedded in the binary
-                     └─ SQLite database file (bundled into the binary as a library)
+```mermaid
+flowchart LR
+  browser([Browser]) -->|HTTP| hs
+  subgraph hs[home_screen: one program]
+    srv[HTTP server<br/>127.0.0.1:7878]
+    ui[Web interface<br/>embedded in the binary]
+    db[(SQLite file<br/>bundled library)]
+    srv --- ui
+    srv --- db
+  end
 ```
 
 There is no separate web server, no Node.js at run time and no database service to install.

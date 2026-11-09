@@ -1,4 +1,5 @@
 # Home Screen
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-rmalcomber-FFDD00?logo=buymeacoffee&logoColor=000000)](https://buymeacoffee.com/rmalcomber)
 
 A personal, self-hosted start page for Chrome: a grid of collapsible **tiles** (bookmarks, dev environments, GitHub repos, widgets) plus a **VS Code–style launcher** (`Ctrl+P`) that searches everything and doubles as a calculator, converter, curl runner, JSON formatter, JWT decoder, regex tester and more.
 
@@ -485,3 +486,8 @@ A tile looks like `{ "id", "type", "title", "icon", "x", "y", "w", "h", "collaps
 - **Icons, favicons or weather are missing**: they need internet access (see [Privacy and security](#privacy-and-security)).
 - **The curl runner says it only works via localhost**: open the app as `http://localhost:7878` or `http://127.0.0.1:7878`, or list the name you use in `--allowed-hosts` / `HOME_SCREEN_ALLOWED_HOSTS`.
 - **Lost your layout after changing the port or folder**: data lives in `home_screen.db` next to the exe; make sure you are starting the copy that has your database, or pass `--db`.
+
+
+## Support
+
+If this is useful to you, you can [buy me a coffee](https://buymeacoffee.com/rmalcomber).

@@ -39,3 +39,7 @@ Developers, SREs and anyone who works across many internal and external systems.
 ## Status
 
 Home Screen is a **beta**. It is stable enough for daily use, and the documentation here describes what ships today. The [roadmap](/roadmap/) lists what might come next, and the [release notes](/releases/) track every version.
+
+## Support
+
+If Home Screen is useful to you, you can [buy me a coffee](https://buymeacoffee.com/rmalcomber).
