@@ -12,7 +12,11 @@ export const site = {
   repoUrl,
   releasesUrl: `${repoUrl}/releases`,
   version: '0.4.0-beta',
-  beta: 'Beta: Home Screen is under active development. Expect rough edges and changing features.',
+  stage: 'beta',
+  support: {
+    coffee: 'https://buymeacoffee.com/rmalcomber',
+    sponsors: 'https://github.com/sponsors/rmalcomber',
+  },
 }
 
 /** Values for {{repo}}, {{releases}}, {{version}} and {{name}} in Markdown. */
