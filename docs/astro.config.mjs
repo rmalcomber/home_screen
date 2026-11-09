@@ -64,6 +64,7 @@ export default defineConfig({
         },
         { label: 'Widgets', items: [{ autogenerate: { directory: 'widgets' } }] },
         { label: 'Reference', items: [{ autogenerate: { directory: 'reference' } }] },
+        { label: 'Project', items: ['project/contributing'] },
         { label: 'Roadmap', items: ['roadmap'] },
         { label: 'Releases', items: [{ autogenerate: { directory: 'releases' } }] },
       ],
